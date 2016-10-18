@@ -1,0 +1,8 @@
+Version: Version 0.6.4
+Source: http://www.mikrocontroller.net/articles/AVR_FAT32
+
+Changes:
+
+- http://www.mikrocontroller.net/topic/105869#2567104
+- Added ffwrites_P to file.c
+

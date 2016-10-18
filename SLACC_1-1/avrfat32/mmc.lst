@@ -1,0 +1,699 @@
+   1               		.file	"mmc.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__ = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+  15               	.Ltext0:
+  17               	spi_write_byte:
+  18               	.LFB2:
+  19               	.LM1:
+  20               	.LVL0:
+  21               	/* prologue: function */
+  22               	/* frame size = 0 */
+  23               	/* stack size = 0 */
+  24               	.L__stack_usage = 0
+  25               	.LM2:
+  26 0000 8EBD      		out 78-32,r24
+  27               	.L2:
+  28               	.LM3:
+  29 0002 0DB4      		in __tmp_reg__,77-32
+  30 0004 07FE      		sbrs __tmp_reg__,7
+  31 0006 00C0      		rjmp .L2
+  32               	/* epilogue start */
+  33               	.LM4:
+  34 0008 0895      		ret
+  35               	.LFE2:
+  38               	spi_read_byte:
+  39               	.LFB3:
+  40               	.LM5:
+  41               	/* prologue: function */
+  42               	/* frame size = 0 */
+  43               	/* stack size = 0 */
+  44               	.L__stack_usage = 0
+  45               	.LM6:
+  46 000a 8FEF      		ldi r24,lo8(-1)
+  47 000c 8EBD      		out 78-32,r24
+  48               	.L5:
+  49               	.LM7:
+  50 000e 0DB4      		in __tmp_reg__,77-32
+  51 0010 07FE      		sbrs __tmp_reg__,7
+  52 0012 00C0      		rjmp .L5
+  53               	.LM8:
+  54 0014 8EB5      		in r24,78-32
+  55               	/* epilogue start */
+  56               	.LM9:
+  57 0016 0895      		ret
+  58               	.LFE3:
+  61               	mmc_disable:
+  62               	.LFB7:
+  63               	.LM10:
+  64               	/* prologue: function */
+  65               	/* frame size = 0 */
+  66               	/* stack size = 0 */
+  67               	.L__stack_usage = 0
+  68               	.LM11:
+  69 0018 2A9A      		sbi 37-32,2
+  70               	.LM12:
+  71 001a 0E94 0000 		call spi_read_byte
+  72               	/* epilogue start */
+  73               	.LM13:
+  74 001e 0895      		ret
+  75               	.LFE7:
+  78               	mmc_wait_ready:
+  79               	.LFB8:
+  80               	.LM14:
+  81               	/* prologue: function */
+  82               	/* frame size = 0 */
+  83               	/* stack size = 0 */
+  84               	.L__stack_usage = 0
+  85               	.LM15:
+  86 0020 82E3      		ldi r24,lo8(50)
+  87 0022 8093 0000 		sts TimingDelay,r24
+  88               	.L10:
+  89               	.LM16:
+  90 0026 0E94 0000 		call spi_read_byte
+  91 002a 8F3F      		cpi r24,lo8(-1)
+  92 002c 01F0      		breq .L11
+  93               	.LM17:
+  94 002e 8091 0000 		lds r24,TimingDelay
+  95 0032 8823      		tst r24
+  96 0034 01F4      		brne .L10
+  97 0036 0895      		ret
+  98               	.L11:
+  99               	.LM18:
+ 100 0038 81E0      		ldi r24,lo8(1)
+ 101               	.LM19:
+ 102 003a 0895      		ret
+ 103               	.LFE8:
+ 106               	mmc_send_cmd:
+ 107               	.LFB5:
+ 108               	.LM20:
+ 109               	.LVL1:
+ 110 003c DF92      		push r13
+ 111 003e EF92      		push r14
+ 112 0040 FF92      		push r15
+ 113 0042 0F93      		push r16
+ 114 0044 1F93      		push r17
+ 115               	/* prologue: function */
+ 116               	/* frame size = 0 */
+ 117               	/* stack size = 5 */
+ 118               	.L__stack_usage = 5
+ 119 0046 182F      		mov r17,r24
+ 120 0048 042F      		mov r16,r20
+ 121 004a F52E      		mov r15,r21
+ 122 004c E62E      		mov r14,r22
+ 123 004e D72E      		mov r13,r23
+ 124               	.LM21:
+ 125 0050 0E94 0000 		call mmc_disable
+ 126               	.LVL2:
+ 127               	.LBB8:
+ 128               	.LBB9:
+ 129               	.LM22:
+ 130 0054 2A98      		cbi 37-32,2
+ 131               	.LM23:
+ 132 0056 0E94 0000 		call mmc_wait_ready
+ 133 005a 8823      		tst r24
+ 134 005c 01F4      		brne .L14
+ 135               	.LM24:
+ 136 005e 0E94 0000 		call mmc_disable
+ 137               	.LM25:
+ 138 0062 8FEF      		ldi r24,lo8(-1)
+ 139 0064 00C0      		rjmp .L15
+ 140               	.L14:
+ 141               	.LBE9:
+ 142               	.LBE8:
+ 143               	.LM26:
+ 144 0066 812F      		mov r24,r17
+ 145 0068 8064      		ori r24,lo8(64)
+ 146 006a 0E94 0000 		call spi_write_byte
+ 147               	.LM27:
+ 148 006e 8D2D      		mov r24,r13
+ 149 0070 0E94 0000 		call spi_write_byte
+ 150               	.LM28:
+ 151 0074 8E2D      		mov r24,r14
+ 152 0076 0E94 0000 		call spi_write_byte
+ 153               	.LM29:
+ 154 007a 8F2D      		mov r24,r15
+ 155 007c 0E94 0000 		call spi_write_byte
+ 156               	.LM30:
+ 157 0080 802F      		mov r24,r16
+ 158 0082 0E94 0000 		call spi_write_byte
+ 159               	.LVL3:
+ 160               	.LM31:
+ 161 0086 1123      		tst r17
+ 162 0088 01F0      		breq .L20
+ 163               	.LM32:
+ 164 008a 1830      		cpi r17,lo8(8)
+ 165 008c 01F0      		breq .L21
+ 166               	.LM33:
+ 167 008e 81E0      		ldi r24,lo8(1)
+ 168 0090 00C0      		rjmp .L17
+ 169               	.L20:
+ 170               	.LM34:
+ 171 0092 85E9      		ldi r24,lo8(-107)
+ 172 0094 00C0      		rjmp .L17
+ 173               	.L21:
+ 174               	.LM35:
+ 175 0096 87E8      		ldi r24,lo8(-121)
+ 176               	.L17:
+ 177               	.LVL4:
+ 178               	.LM36:
+ 179 0098 0E94 0000 		call spi_write_byte
+ 180               	.LVL5:
+ 181               	.LM37:
+ 182 009c 1C30      		cpi r17,lo8(12)
+ 183 009e 01F4      		brne .L18
+ 184               	.LM38:
+ 185 00a0 0E94 0000 		call spi_read_byte
+ 186               	.L18:
+ 187               	.LM39:
+ 188 00a4 1AE0      		ldi r17,lo8(10)
+ 189               	.LVL6:
+ 190               	.L19:
+ 191               	.LM40:
+ 192 00a6 0E94 0000 		call spi_read_byte
+ 193               	.LVL7:
+ 194               	.LM41:
+ 195 00aa 87FF      		sbrs r24,7
+ 196 00ac 00C0      		rjmp .L15
+ 197 00ae 1150      		subi r17,lo8(-(-1))
+ 198               	.LVL8:
+ 199 00b0 01F4      		brne .L19
+ 200               	.LVL9:
+ 201               	.L15:
+ 202               	/* epilogue start */
+ 203               	.LM42:
+ 204 00b2 1F91      		pop r17
+ 205 00b4 0F91      		pop r16
+ 206 00b6 FF90      		pop r15
+ 207 00b8 EF90      		pop r14
+ 208 00ba DF90      		pop r13
+ 209 00bc 0895      		ret
+ 210               	.LFE5:
+ 212               	.global	mmc_init
+ 214               	mmc_init:
+ 215               	.LFB4:
+ 216               	.LM43:
+ 217 00be CF92      		push r12
+ 218 00c0 DF92      		push r13
+ 219 00c2 EF92      		push r14
+ 220 00c4 FF92      		push r15
+ 221 00c6 0F93      		push r16
+ 222 00c8 1F93      		push r17
+ 223 00ca DF93      		push r29
+ 224 00cc CF93      		push r28
+ 225 00ce 00D0      		rcall .
+ 226 00d0 00D0      		rcall .
+ 227 00d2 CDB7      		in r28,__SP_L__
+ 228 00d4 DEB7      		in r29,__SP_H__
+ 229               	/* prologue: function */
+ 230               	/* frame size = 4 */
+ 231               	/* stack size = 12 */
+ 232               	.L__stack_usage = 12
+ 233               	.LBB10:
+ 234               	.LBB11:
+ 235               	.LM44:
+ 236 00d6 2498      		cbi 36-32,4
+ 237               	.LM45:
+ 238 00d8 259A      		sbi 36-32,5
+ 239               	.LM46:
+ 240 00da 239A      		sbi 36-32,3
+ 241               	.LM47:
+ 242 00dc 229A      		sbi 36-32,2
+ 243               	.LM48:
+ 244 00de 83E5      		ldi r24,lo8(83)
+ 245 00e0 8CBD      		out 76-32,r24
+ 246               	.LM49:
+ 247 00e2 2A9A      		sbi 37-32,2
+ 248               	.LBE11:
+ 249               	.LBE10:
+ 250               	.LM50:
+ 251 00e4 0E94 0000 		call mmc_disable
+ 252               	.LVL10:
+ 253 00e8 04E6      		ldi r16,lo8(100)
+ 254 00ea 10E0      		ldi r17,hi8(100)
+ 255               	.LVL11:
+ 256               	.L24:
+ 257               	.LM51:
+ 258 00ec 0E94 0000 		call spi_read_byte
+ 259 00f0 0150      		subi r16,lo8(-(-1))
+ 260 00f2 1040      		sbci r17,hi8(-(-1))
+ 261 00f4 01F4      		brne .L24
+ 262               	.LM52:
+ 263 00f6 04E6      		ldi r16,lo8(100)
+ 264 00f8 10E0      		ldi r17,hi8(100)
+ 265               	.L42:
+ 266               	.LVL12:
+ 267               	.LM53:
+ 268 00fa 80E0      		ldi r24,lo8(0)
+ 269 00fc 40E0      		ldi r20,lo8(0)
+ 270 00fe 50E0      		ldi r21,hi8(0)
+ 271 0100 BA01      		movw r22,r20
+ 272 0102 0E94 0000 		call mmc_send_cmd
+ 273 0106 8130      		cpi r24,lo8(1)
+ 274 0108 01F0      		breq .+2
+ 275 010a 00C0      		rjmp .L25
+ 276               	.LVL13:
+ 277               	.LM54:
+ 278 010c 84E6      		ldi r24,lo8(100)
+ 279 010e 8093 0000 		sts TimingDelay,r24
+ 280               	.LM55:
+ 281 0112 88E0      		ldi r24,lo8(8)
+ 282 0114 4AEA      		ldi r20,lo8(426)
+ 283 0116 51E0      		ldi r21,hi8(426)
+ 284 0118 60E0      		ldi r22,hlo8(426)
+ 285 011a 70E0      		ldi r23,hhi8(426)
+ 286 011c 0E94 0000 		call mmc_send_cmd
+ 287 0120 8130      		cpi r24,lo8(1)
+ 288 0122 01F0      		breq .+2
+ 289 0124 00C0      		rjmp .L26
+ 290 0126 8E01      		movw r16,r28
+ 291 0128 0F5F      		subi r16,lo8(-(1))
+ 292 012a 1F4F      		sbci r17,hi8(-(1))
+ 293               	.LM56:
+ 294 012c 85E0      		ldi r24,lo8(5)
+ 295 012e E82E      		mov r14,r24
+ 296 0130 F12C      		mov r15,__zero_reg__
+ 297 0132 EC0E      		add r14,r28
+ 298 0134 FD1E      		adc r15,r29
+ 299 0136 6801      		movw r12,r16
+ 300               	.L27:
+ 301               	.LM57:
+ 302 0138 0E94 0000 		call spi_read_byte
+ 303 013c F601      		movw r30,r12
+ 304 013e 8193      		st Z+,r24
+ 305 0140 6F01      		movw r12,r30
+ 306               	.LM58:
+ 307 0142 EE15      		cp r30,r14
+ 308 0144 FF05      		cpc r31,r15
+ 309 0146 01F4      		brne .L27
+ 310               	.LM59:
+ 311 0148 8B81      		ldd r24,Y+3
+ 312 014a 8130      		cpi r24,lo8(1)
+ 313 014c 01F0      		breq .+2
+ 314 014e 00C0      		rjmp .L28
+ 315               	.LM60:
+ 316 0150 8C81      		ldd r24,Y+4
+ 317 0152 8A3A      		cpi r24,lo8(-86)
+ 318 0154 01F0      		breq .+2
+ 319 0156 00C0      		rjmp .L28
+ 320 0158 00C0      		rjmp .L61
+ 321               	.L31:
+ 322               	.LM61:
+ 323 015a 87E3      		ldi r24,lo8(55)
+ 324 015c 40E0      		ldi r20,lo8(0)
+ 325 015e 50E0      		ldi r21,hi8(0)
+ 326 0160 BA01      		movw r22,r20
+ 327 0162 0E94 0000 		call mmc_send_cmd
+ 328               	.LM62:
+ 329 0166 89E2      		ldi r24,lo8(41)
+ 330 0168 40E0      		ldi r20,lo8(1073741824)
+ 331 016a 50E0      		ldi r21,hi8(1073741824)
+ 332 016c 60E0      		ldi r22,hlo8(1073741824)
+ 333 016e 70E4      		ldi r23,hhi8(1073741824)
+ 334 0170 0E94 0000 		call mmc_send_cmd
+ 335 0174 8823      		tst r24
+ 336 0176 01F0      		breq .L52
+ 337               	.L61:
+ 338               	.LM63:
+ 339 0178 8091 0000 		lds r24,TimingDelay
+ 340 017c 8823      		tst r24
+ 341 017e 01F4      		brne .L31
+ 342 0180 00C0      		rjmp .L52
+ 343               	.L36:
+ 344               	.LM64:
+ 345 0182 8AE3      		ldi r24,lo8(58)
+ 346 0184 40E0      		ldi r20,lo8(0)
+ 347 0186 50E0      		ldi r21,hi8(0)
+ 348 0188 BA01      		movw r22,r20
+ 349 018a 0E94 0000 		call mmc_send_cmd
+ 350 018e 8823      		tst r24
+ 351 0190 01F4      		brne .L52
+ 352               	.L51:
+ 353               	.LM65:
+ 354 0192 0E94 0000 		call spi_read_byte
+ 355 0196 F801      		movw r30,r16
+ 356 0198 8193      		st Z+,r24
+ 357 019a 8F01      		movw r16,r30
+ 358               	.LM66:
+ 359 019c EE15      		cp r30,r14
+ 360 019e FF05      		cpc r31,r15
+ 361 01a0 01F4      		brne .L51
+ 362               	.LM67:
+ 363 01a2 8981      		ldd r24,Y+1
+ 364 01a4 86FD      		sbrc r24,6
+ 365 01a6 00C0      		rjmp .L46
+ 366 01a8 04E0      		ldi r16,lo8(4)
+ 367 01aa 00C0      		rjmp .L50
+ 368               	.L52:
+ 369               	.LM68:
+ 370 01ac 8091 0000 		lds r24,TimingDelay
+ 371 01b0 8823      		tst r24
+ 372 01b2 01F4      		brne .L36
+ 373 01b4 00C0      		rjmp .L28
+ 374               	.L26:
+ 375               	.LM69:
+ 376 01b6 89E2      		ldi r24,lo8(41)
+ 377 01b8 40E0      		ldi r20,lo8(0)
+ 378 01ba 50E0      		ldi r21,hi8(0)
+ 379 01bc BA01      		movw r22,r20
+ 380 01be 0E94 0000 		call mmc_send_cmd
+ 381 01c2 8230      		cpi r24,lo8(2)
+ 382 01c4 00F4      		brsh .L47
+ 383               	.LM70:
+ 384 01c6 02E0      		ldi r16,lo8(2)
+ 385               	.LM71:
+ 386 01c8 19E2      		ldi r17,lo8(41)
+ 387 01ca 00C0      		rjmp .L53
+ 388               	.L47:
+ 389               	.LM72:
+ 390 01cc 01E0      		ldi r16,lo8(1)
+ 391               	.LM73:
+ 392 01ce 11E0      		ldi r17,lo8(1)
+ 393               	.LVL14:
+ 394               	.L53:
+ 395               	.LM74:
+ 396 01d0 8091 0000 		lds r24,TimingDelay
+ 397 01d4 8823      		tst r24
+ 398 01d6 01F0      		breq .L50
+ 399               	.LM75:
+ 400 01d8 812F      		mov r24,r17
+ 401 01da 40E0      		ldi r20,lo8(0)
+ 402 01dc 50E0      		ldi r21,hi8(0)
+ 403 01de BA01      		movw r22,r20
+ 404 01e0 0E94 0000 		call mmc_send_cmd
+ 405 01e4 8823      		tst r24
+ 406 01e6 01F4      		brne .L53
+ 407 01e8 00C0      		rjmp .L50
+ 408               	.LVL15:
+ 409               	.L28:
+ 410               	.LM76:
+ 411 01ea 00E0      		ldi r16,lo8(0)
+ 412               	.LVL16:
+ 413               	.L50:
+ 414               	.LM77:
+ 415 01ec 8091 0000 		lds r24,TimingDelay
+ 416 01f0 8823      		tst r24
+ 417 01f2 01F0      		breq .L34
+ 418               	.LM78:
+ 419 01f4 80E1      		ldi r24,lo8(16)
+ 420 01f6 40E0      		ldi r20,lo8(512)
+ 421 01f8 52E0      		ldi r21,hi8(512)
+ 422 01fa 60E0      		ldi r22,hlo8(512)
+ 423 01fc 70E0      		ldi r23,hhi8(512)
+ 424 01fe 0E94 0000 		call mmc_send_cmd
+ 425 0202 8823      		tst r24
+ 426 0204 01F4      		brne .L50
+ 427 0206 00C0      		rjmp .L34
+ 428               	.LVL17:
+ 429               	.L46:
+ 430               	.LM79:
+ 431 0208 0CE0      		ldi r16,lo8(12)
+ 432               	.LVL18:
+ 433               	.L34:
+ 434               	.LM80:
+ 435 020a 8091 0000 		lds r24,TimingDelay
+ 436 020e 8823      		tst r24
+ 437 0210 01F0      		breq .L62
+ 438 0212 00C0      		rjmp .L45
+ 439               	.LVL19:
+ 440               	.L25:
+ 441               	.LM81:
+ 442 0214 0150      		subi r16,lo8(-(-1))
+ 443 0216 1040      		sbci r17,hi8(-(-1))
+ 444               	.LVL20:
+ 445               	.LM82:
+ 446 0218 01F0      		breq .+2
+ 447 021a 00C0      		rjmp .L42
+ 448               	.LVL21:
+ 449               	.L62:
+ 450 021c 00E0      		ldi r16,lo8(0)
+ 451               	.L45:
+ 452               	.LM83:
+ 453 021e 0093 0000 		sts fat+23,r16
+ 454               	.LM84:
+ 455 0222 0E94 0000 		call mmc_disable
+ 456               	.LM85:
+ 457 0226 8091 0000 		lds r24,fat+23
+ 458 022a 8823      		tst r24
+ 459 022c 01F0      		breq .L49
+ 460               	.LBB12:
+ 461               	.LBB13:
+ 462               	.LM86:
+ 463 022e 8CB5      		in r24,76-32
+ 464 0230 8C7F      		andi r24,lo8(-4)
+ 465 0232 8CBD      		out 76-32,r24
+ 466               	.LM87:
+ 467 0234 8DB5      		in r24,77-32
+ 468 0236 8160      		ori r24,lo8(1)
+ 469 0238 8DBD      		out 77-32,r24
+ 470               	.LBE13:
+ 471               	.LBE12:
+ 472               	.LM88:
+ 473 023a 81E0      		ldi r24,lo8(1)
+ 474 023c 00C0      		rjmp .L43
+ 475               	.L49:
+ 476               	.LM89:
+ 477 023e 80E0      		ldi r24,lo8(0)
+ 478               	.L43:
+ 479               	/* epilogue start */
+ 480               	.LM90:
+ 481 0240 0F90      		pop __tmp_reg__
+ 482 0242 0F90      		pop __tmp_reg__
+ 483 0244 0F90      		pop __tmp_reg__
+ 484 0246 0F90      		pop __tmp_reg__
+ 485 0248 CF91      		pop r28
+ 486 024a DF91      		pop r29
+ 487 024c 1F91      		pop r17
+ 488 024e 0F91      		pop r16
+ 489 0250 FF90      		pop r15
+ 490 0252 EF90      		pop r14
+ 491 0254 DF90      		pop r13
+ 492 0256 CF90      		pop r12
+ 493 0258 0895      		ret
+ 494               	.LFE4:
+ 496               	.global	mmc_write_sector
+ 498               	mmc_write_sector:
+ 499               	.LFB9:
+ 500               	.LM91:
+ 501               	.LVL22:
+ 502 025a 0F93      		push r16
+ 503 025c 1F93      		push r17
+ 504 025e CF93      		push r28
+ 505 0260 DF93      		push r29
+ 506               	/* prologue: function */
+ 507               	/* frame size = 0 */
+ 508               	/* stack size = 4 */
+ 509               	.L__stack_usage = 4
+ 510 0262 8B01      		movw r16,r22
+ 511 0264 9C01      		movw r18,r24
+ 512 0266 EA01      		movw r28,r20
+ 513               	.LM92:
+ 514 0268 8091 0000 		lds r24,fat+23
+ 515 026c 83FD      		sbrc r24,3
+ 516 026e 00C0      		rjmp .L64
+ 517               	.LVL23:
+ 518               	.LM93:
+ 519 0270 99E0      		ldi r25,9
+ 520 0272 000F      	1:	lsl r16
+ 521 0274 111F      		rol r17
+ 522 0276 221F      		rol r18
+ 523 0278 331F      		rol r19
+ 524 027a 9A95      		dec r25
+ 525 027c 01F4      		brne 1b
+ 526               	.LVL24:
+ 527               	.L64:
+ 528               	.LM94:
+ 529 027e 88E1      		ldi r24,lo8(24)
+ 530 0280 B901      		movw r22,r18
+ 531 0282 A801      		movw r20,r16
+ 532               	.LVL25:
+ 533 0284 0E94 0000 		call mmc_send_cmd
+ 534 0288 8823      		tst r24
+ 535 028a 01F4      		brne .L71
+ 536               	.LM95:
+ 537 028c 0E94 0000 		call mmc_wait_ready
+ 538 0290 8823      		tst r24
+ 539 0292 01F0      		breq .L71
+ 540               	.LM96:
+ 541 0294 8EEF      		ldi r24,lo8(-2)
+ 542 0296 0E94 0000 		call spi_write_byte
+ 543               	.LVL26:
+ 544               	.LM97:
+ 545 029a 00E0      		ldi r16,lo8(512)
+ 546 029c 12E0      		ldi r17,hi8(512)
+ 547               	.LVL27:
+ 548               	.L66:
+ 549               	.LM98:
+ 550 029e 8991      		ld r24,Y+
+ 551               	.LVL28:
+ 552 02a0 0E94 0000 		call spi_write_byte
+ 553               	.LM99:
+ 554 02a4 0150      		subi r16,lo8(-(-1))
+ 555 02a6 1040      		sbci r17,hi8(-(-1))
+ 556               	.LVL29:
+ 557 02a8 01F4      		brne .L66
+ 558               	.LM100:
+ 559 02aa 8FEF      		ldi r24,lo8(-1)
+ 560 02ac 0E94 0000 		call spi_write_byte
+ 561               	.LM101:
+ 562 02b0 8FEF      		ldi r24,lo8(-1)
+ 563 02b2 0E94 0000 		call spi_write_byte
+ 564               	.LVL30:
+ 565               	.LM102:
+ 566 02b6 04E1      		ldi r16,lo8(20)
+ 567               	.LVL31:
+ 568               	.L68:
+ 569               	.LM103:
+ 570 02b8 0E94 0000 		call spi_read_byte
+ 571               	.LVL32:
+ 572               	.LM104:
+ 573 02bc 8F71      		andi r24,lo8(31)
+ 574               	.LVL33:
+ 575 02be 8530      		cpi r24,lo8(5)
+ 576 02c0 01F0      		breq .L67
+ 577 02c2 0150      		subi r16,lo8(-(-1))
+ 578               	.LVL34:
+ 579 02c4 01F4      		brne .L68
+ 580 02c6 00C0      		rjmp .L71
+ 581               	.L67:
+ 582               	.LM105:
+ 583 02c8 0023      		tst r16
+ 584 02ca 01F0      		breq .L71
+ 585               	.LM106:
+ 586 02cc 0E94 0000 		call mmc_disable
+ 587               	.LM107:
+ 588 02d0 81E0      		ldi r24,lo8(1)
+ 589 02d2 00C0      		rjmp .L65
+ 590               	.LVL35:
+ 591               	.L71:
+ 592               	.LM108:
+ 593 02d4 80E0      		ldi r24,lo8(0)
+ 594               	.L65:
+ 595               	/* epilogue start */
+ 596               	.LM109:
+ 597 02d6 DF91      		pop r29
+ 598 02d8 CF91      		pop r28
+ 599 02da 1F91      		pop r17
+ 600 02dc 0F91      		pop r16
+ 601 02de 0895      		ret
+ 602               	.LFE9:
+ 604               	.global	mmc_read_sector
+ 606               	mmc_read_sector:
+ 607               	.LFB10:
+ 608               	.LM110:
+ 609               	.LVL36:
+ 610 02e0 0F93      		push r16
+ 611 02e2 1F93      		push r17
+ 612 02e4 CF93      		push r28
+ 613 02e6 DF93      		push r29
+ 614               	/* prologue: function */
+ 615               	/* frame size = 0 */
+ 616               	/* stack size = 4 */
+ 617               	.L__stack_usage = 4
+ 618 02e8 8B01      		movw r16,r22
+ 619 02ea 9C01      		movw r18,r24
+ 620 02ec EA01      		movw r28,r20
+ 621               	.LM111:
+ 622 02ee 8091 0000 		lds r24,fat+23
+ 623 02f2 83FD      		sbrc r24,3
+ 624 02f4 00C0      		rjmp .L75
+ 625               	.LVL37:
+ 626               	.LM112:
+ 627 02f6 49E0      		ldi r20,9
+ 628 02f8 000F      	1:	lsl r16
+ 629 02fa 111F      		rol r17
+ 630 02fc 221F      		rol r18
+ 631 02fe 331F      		rol r19
+ 632 0300 4A95      		dec r20
+ 633 0302 01F4      		brne 1b
+ 634               	.LVL38:
+ 635               	.L75:
+ 636               	.LM113:
+ 637 0304 81E1      		ldi r24,lo8(17)
+ 638 0306 B901      		movw r22,r18
+ 639 0308 A801      		movw r20,r16
+ 640 030a 0E94 0000 		call mmc_send_cmd
+ 641 030e 8823      		tst r24
+ 642 0310 01F4      		brne .L81
+ 643               	.LM114:
+ 644 0312 84E1      		ldi r24,lo8(20)
+ 645 0314 8093 0000 		sts TimingDelay,r24
+ 646               	.L78:
+ 647               	.LM115:
+ 648 0318 0E94 0000 		call spi_read_byte
+ 649               	.LVL39:
+ 650               	.LM116:
+ 651 031c 8F3F      		cpi r24,lo8(-1)
+ 652 031e 01F4      		brne .L77
+ 653 0320 8091 0000 		lds r24,TimingDelay
+ 654               	.LVL40:
+ 655 0324 8823      		tst r24
+ 656 0326 01F4      		brne .L78
+ 657 0328 00C0      		rjmp .L76
+ 658               	.LVL41:
+ 659               	.L77:
+ 660               	.LM117:
+ 661 032a 8E3F      		cpi r24,lo8(-2)
+ 662 032c 01F4      		brne .L81
+ 663               	.LM118:
+ 664 032e 00E0      		ldi r16,lo8(512)
+ 665 0330 12E0      		ldi r17,hi8(512)
+ 666               	.LVL42:
+ 667               	.L79:
+ 668               	.LM119:
+ 669 0332 0E94 0000 		call spi_read_byte
+ 670 0336 8993      		st Y+,r24
+ 671               	.LVL43:
+ 672               	.LM120:
+ 673 0338 0150      		subi r16,lo8(-(-1))
+ 674 033a 1040      		sbci r17,hi8(-(-1))
+ 675               	.LVL44:
+ 676 033c 01F4      		brne .L79
+ 677               	.LM121:
+ 678 033e 0E94 0000 		call spi_read_byte
+ 679               	.LM122:
+ 680 0342 0E94 0000 		call spi_read_byte
+ 681               	.LM123:
+ 682 0346 0E94 0000 		call mmc_disable
+ 683               	.LM124:
+ 684 034a 81E0      		ldi r24,lo8(1)
+ 685 034c 00C0      		rjmp .L76
+ 686               	.LVL45:
+ 687               	.L81:
+ 688               	.LM125:
+ 689 034e 80E0      		ldi r24,lo8(0)
+ 690               	.LVL46:
+ 691               	.L76:
+ 692               	/* epilogue start */
+ 693               	.LM126:
+ 694 0350 DF91      		pop r29
+ 695 0352 CF91      		pop r28
+ 696               	.LVL47:
+ 697 0354 1F91      		pop r17
+ 698 0356 0F91      		pop r16
+ 699 0358 0895      		ret
+ 700               	.LFE10:
+ 782               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 mmc.c
+     /tmp/ccfVs5yS.s:2      *ABS*:000000000000003f __SREG__
+     /tmp/ccfVs5yS.s:3      *ABS*:000000000000003e __SP_H__
+     /tmp/ccfVs5yS.s:4      *ABS*:000000000000003d __SP_L__
+     /tmp/ccfVs5yS.s:5      *ABS*:0000000000000034 __CCP__
+     /tmp/ccfVs5yS.s:6      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccfVs5yS.s:7      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccfVs5yS.s:17     .text:0000000000000000 spi_write_byte
+     /tmp/ccfVs5yS.s:38     .text:000000000000000a spi_read_byte
+     /tmp/ccfVs5yS.s:61     .text:0000000000000018 mmc_disable
+     /tmp/ccfVs5yS.s:78     .text:0000000000000020 mmc_wait_ready
+     /tmp/ccfVs5yS.s:106    .text:000000000000003c mmc_send_cmd
+     /tmp/ccfVs5yS.s:214    .text:00000000000000be mmc_init
+     /tmp/ccfVs5yS.s:498    .text:000000000000025a mmc_write_sector
+     /tmp/ccfVs5yS.s:606    .text:00000000000002e0 mmc_read_sector
+
+UNDEFINED SYMBOLS
+TimingDelay
+fat
