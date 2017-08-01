@@ -1,6 +1,5 @@
-#include "adc.h"
+#include <adc.h>
 #include <stdint.h>
-#include <avr/io.h>
 
 /*
 Use the analog/digital-converter a more comfortable way.
@@ -15,14 +14,20 @@ void adc_init(adc_voltageReference voltageReference, adc_adjustResult adjustResu
 {
     // ADMUX – ADC Multiplexer Selection Register
     ADMUX = voltageReference | adjustResult;
-    // ADCSRA – ADC Control and Status Register A
+    /*
+     * ADCSRA – ADC Control and Status Register A.
+     * adc.h automatically calculates prescaler settings for maximum allowable ADC clock.
+     */
     ADCSRA = autoTrigger | interrupt | ADC_PRESCALER_REG;
     // ADCSRB – ADC Control and Status Register B
     ADCSRB = autoTriggerSource;
+    // disable digital input buffers for the six double-usage pins - we use all of them as analog inputs.
+    DIDR0 = (1 << ADC0D) | (1 << ADC1D) | (1 << ADC2D) | (1 << ADC3D) | (1 << ADC5D) | (1 << ADC5D) ;
 }
 
 
 // single conversion of selected channel
+// With ADC_clock = 16 MHz / 128 = 125kHz and 13 ADC_clock cycles per conversion, this takes 1.04ms.
 uint16_t adc_singleConversion(void)
 {
     ADCSRA |= (1 << ADSC); // start conversion
@@ -32,6 +37,7 @@ uint16_t adc_singleConversion(void)
 
 
 // 16x supersampling to achieve 12 bit resolution with 10 bit ADC
+// since each sample needs roughly 1.04 ms, this takes approx.  16,64 ms.
 uint16_t adc_12BitConversion(uint8_t channel)
 {
     uint16_t adc = 0;

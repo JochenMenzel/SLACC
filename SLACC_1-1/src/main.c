@@ -2,28 +2,26 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/power.h>
-#include <avr/sleep.h>
-#include <util/atomic.h>
 #include <util/delay.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "xtoa.h"
 #include "adc.h"
-#include "csv.h"
 #include "load.h"
 #include "led.h"
 #include "main.h"
 #include "uart.h"
 #include "datetime.h"
 #include "pwm.h"
-#include "fifo.h"
-#include "xtoa.h"
 #include "measurement.h"
-
+#include "T123-master/EAT123_I2C.h"
 
 /*
 SLACC - Solar lead acid charge controller firmware
 Frank Bättermann (frank.baettermann@ich-war-hier.de)
+
+fixes and optimizations by Dipl.-Ing. Jochen Menzel in July 2017
 
 TODO: On the fly frequency switching not implemented, yet!
 
@@ -39,11 +37,11 @@ TODO in next HW revision:
 - 3.3V design with XMEGA (12 bit ADC, 10 Bit pwm, PLL?)
 - Ability to cut supply for voltage/current sensing
 - Filter AVCC
-- Ability to cut supply for sd-card (remove seperate 3.3V reulator)
+- Ability to cut supply for sd-card (remove separate 3.3V regulator)
 - Add voltage/current lowpass with op amp
 - Change charge current sensing to about 16A (shunt)
 - Measure current for load-drop and drop depending on actual voltage & current
-- MINI SMD VERSION? (smd mosfet, shottky diode, single phase, max 1A smd power inductor)
+- MINI SMD VERSION? (smd mosfet, schottky diode, single phase, max 1A smd power inductor)
 */
 
 
@@ -142,21 +140,91 @@ void chargeMppt(void)
     }
 }
 
+/*
+ * 123456789012
+ * 12.2V 10.1A
+ * 12.2V 999mA
+ * 34.1V  3.4A
+ * 60°C charge
+ */
+
+void showProcessValues(void) {
+    char bufferValue[15];
+    char buffer[15];
+    char outLine[15];
+//    size_t length;
+
+    //disable interrupts
+    cli();
+	//jump display cursor to first line first char.
+	T123home();
+    //enable interrupts
+    sei();
+
+	utoa(measurements.batteryVoltage.v, bufferValue, 10);
+
+	// pad string to given length with spaces on left side
+	strpad(outLine, bufferValue , 5, ' ', 0);
+
+	outLine[3] = outLine[2];
+	outLine[2] = '.';
+	outLine[4] = 'V';
+
+	strcat(outLine," ");
+
+	measurements.chargeCurrent.v = 12345;
+
+	//convert charge current value to string
+	utoa(measurements.chargeCurrent.v, bufferValue, 10);
+
+	if(!(measurements.chargeCurrent.v < 1000)){
+		//since we cannot know the number of digits the current reading now has, we pad the string to
+		//five digits by adding spaces on the left side
+		strpad(buffer, bufferValue , 5, 'k', 0);
+		// insert decimal point and unit
+		buffer[3] = buffer[2];
+		buffer[2] = '.';
+		buffer[4] = 'A';
+	}
+	else {
+		//since we cannot know the number of digits the current reading now has, we pad the string to
+		//five digits by adding spaces on the left side
+		strpad(buffer, bufferValue , 3, 'c', 0);
+
+		// current value must have three or less digits. Just add the unit, "mA".
+		strcat(buffer,"mA");
+	}
+
+	//merge value into output line
+	strcat(outLine,buffer);
+
+    //disable interrupts
+    cli();
+	//show output metric data: Intro, battery voltage, battery current
+	T123writeStr(outLine);
+    //enable interrupts
+    sei();
+}
+
 
 int main(void)
 {
-    // initilization
+    // initialization
     led_init();
     pwm_init();
     datetime_init();
     load_init();
     load_disconnect();
-    adc_init(adc_voltageReferenceAref, adc_adjustResultRight, adc_interruptDisabled, adc_autoTriggerDisabled, adc_autoTriggerSourceFreeRunning);  
+    adc_init(adc_voltageReferenceAref, adc_adjustResultRight, adc_interruptDisabled, adc_autoTriggerDisabled,\
+    		 adc_autoTriggerSourceFreeRunning);
     adc_enable();
     uart_init();
 
     // disable unneeded peripherals
     power_twi_disable();
+
+    // initialize I2C communication and display
+    T123init(LCD_I2CADDRESS, 12, 4);
  
     // enable interrupts
     sei();
@@ -165,31 +233,35 @@ int main(void)
     uart_puts_P(PSTR(FIRMWARE_STRING " " FIRMWARE_VERSION_STRING "\n"));
     
     // csv style output
-    csv_init();
-    csv_writeHeader();
+    // csv_init();
+    // csv_writeHeader();
 
-   
+    //wait some time to let display finish initialisation
+    _delay_us(2200);
+
+    //say hello on Display
+//    char * Text = "Hi Caroline!\n";
+//    T123writeStr(Text);
+
     // main loop
-    for (;;)
-    {
+    for (;;){
         measure();
         
     	// connect/disconnet load
-	    if ((chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v < BATT_U_LOAD_DROP)
-	    {
+	    if ((chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v < BATT_U_LOAD_DROP){
             chargerStatus &= ~chargerStatus_loadConnected;
             load_disconnect();
-#ifdef DEBUG_UART
-            uart_puts_P(PSTR("Status: Load disconnected (battery voltage too low)\n"));
-#endif
+			#ifdef DEBUG_UART
+            	uart_puts_P(PSTR("Status: Load disconnected (battery voltage too low)\n"));
+			#endif
 	    }
-	    else if (!(chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v >= BATT_U_LOAD_RECONNECT)
-	    {
+
+	    else if (!(chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v >= BATT_U_LOAD_RECONNECT){
             chargerStatus |= chargerStatus_loadConnected;
             load_connect();
-#ifdef DEBUG_UART
-            uart_puts_P(PSTR("Status: Load connected (battery voltage sufficient)\n"));
-#endif
+			#ifdef DEBUG_UART
+            	uart_puts_P(PSTR("Status: Load connected (battery voltage sufficient)\n"));
+			#endif
 	    }
 
         // Detect overtemperatures
@@ -199,73 +271,63 @@ int main(void)
             chargerStatus |= chargerStatus_overtemperature2;
         if (measurements.temperature3.v != UINT16_MAX && measurements.temperature3.v >= TEMP3_SHUTDOWN)
             chargerStatus |= chargerStatus_overtemperature3;
-    	
+
     	// Clear battery full-bit (charge to U_max next time)?
     	// Independent from charging status.
     	if (measurements.batteryVoltage.v <= BATT_U_RECHARGE)
             chargerStatus &= ~chargerStatus_full;
 
     	// control battery charging
-	    if (chargerStatus & chargerStatus_charging)
-	    {
+	    if (chargerStatus & chargerStatus_charging){
 	        // currently charging...
-	        
-            if (chargerStatus & chargerStatus_overtemperature1)
-            {
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Overtemperature 1, stopped charging\n"));
-#endif
+	        if (chargerStatus & chargerStatus_overtemperature1){
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Overtemperature 1, stopped charging\n"));
+				#endif
                 stopCharging();
             }
-            else if (chargerStatus & chargerStatus_overtemperature2)
-            {
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Overtemperature 2, stopped charging\n"));
-#endif
+            else if (chargerStatus & chargerStatus_overtemperature2){
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Overtemperature 2, stopped charging\n"));
+				#endif
                 stopCharging();
             }
-            else if (chargerStatus & chargerStatus_overtemperature3)
-            {
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Overtemperature 3, stopped charging\n"));
-#endif
+            else if (chargerStatus & chargerStatus_overtemperature3){
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Overtemperature 3, stopped charging\n"));
+				#endif
                 stopCharging();
             }
-            else if ((chargerStatus & chargerStatus_full) && measurements.batteryVoltage.v >= BATT_U_TICKLE_TOP)
-            {
+            else if ((chargerStatus & chargerStatus_full) && measurements.batteryVoltage.v >= BATT_U_TICKLE_TOP){
                 stopCharging();
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Reached tickle charge top; stopped charging.\n"));
-#endif
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Reached tickle charge top; stopped charging.\n"));
+				#endif
             }
-            else if (!(chargerStatus & chargerStatus_full) && measurements.batteryVoltage.v >= BATT_U_MAX)
-            {
+            else if (!(chargerStatus & chargerStatus_full) && measurements.batteryVoltage.v >= BATT_U_MAX){
                 stopCharging();
                 chargerStatus |= chargerStatus_full; // remember that we reached max. voltage
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Battery full, stoppend charging.\n"));
-#endif
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Battery full, stoppend charging.\n"));
+				#endif
             }
-            else if (measurements.panelCurrent.v < CHARGE_PANEL_CURRENT_MIN)
-            {
+            else if (measurements.panelCurrent.v < CHARGE_PANEL_CURRENT_MIN){
                 stopCharging();
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Stopped charging (panel current too low).\n"));
-#endif
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Stopped charging (panel current too low).\n"));
+				#endif
             }
-            else
-            {
+            else{
                 // we had no reason to stop charging: control mpp
                 chargeMppt();
             }
         }
         else if (chargerStatus & chargerStatus_overtemperature1
               || chargerStatus & chargerStatus_overtemperature2
-              || chargerStatus & chargerStatus_overtemperature3)
-        {
-#ifdef DEBUG_UART
-            uart_puts_P(PSTR("Status: Overtemperature.\n"));
-#endif      
+              || chargerStatus & chargerStatus_overtemperature3){
+			#ifdef DEBUG_UART
+            	uart_puts_P(PSTR("Status: Overtemperature.\n"));
+			#endif
             // not charging: overtemperature
             if (measurements.temperature1.v <= TEMP1_RESTART)
                 chargerStatus &= ~chargerStatus_overtemperature1;
@@ -274,29 +336,25 @@ int main(void)
             if (measurements.temperature3.v <= TEMP3_RESTART)
                 chargerStatus &= ~chargerStatus_overtemperature3;
         }
-	    else if (measurements.panelVoltage.v > measurements.batteryVoltage.v)
-	    {
+	    else if (measurements.panelVoltage.v > measurements.batteryVoltage.v){
 	        // not charging, but panel voltage high enough...
-
- 	        if ((chargerStatus & chargerStatus_full) && measurements.batteryVoltage.v <= BATT_U_TICKLE_BOTTOM)
-	        {
+ 	        if ((chargerStatus & chargerStatus_full) && measurements.batteryVoltage.v <= BATT_U_TICKLE_BOTTOM){
 	            startCharging();
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Started tickle charging.\n"));
-#endif   
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Started tickle charging.\n"));
+				#endif
 	        }
-	        else if (measurements.batteryVoltage.v <= BATT_U_RECHARGE)
-	        {
+	        else if (measurements.batteryVoltage.v <= BATT_U_RECHARGE){
 	            startCharging();
-#ifdef DEBUG_UART
-                uart_puts_P(PSTR("Status: Started charging.\n"));
-#endif   
+				#ifdef DEBUG_UART
+                	uart_puts_P(PSTR("Status: Started charging.\n"));
+				#endif
             }
- 	        
         }
         
         led_update();
-        csv_write();
+        // csv_write();
+        showProcessValues();
     }
     
 	return 0;
