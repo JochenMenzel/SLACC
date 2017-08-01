@@ -36,9 +36,8 @@
 # - DEPFLAGS according to Eric Weddingtion's fix (avrfreaks/gcc-forum)
 # - F_CPU Define in CFLAGS and AFLAGS
 
-
 # MCU name
-MCU = atmega328
+MCU = atmega328p
 AVRDUDE_MCU = m328p
 
 # use this for 16 kHz system clock
@@ -61,8 +60,10 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c adc.c csv.c led.c load.c uart.c datetime.c pwm.c fifo.c linearize.c xtoa.c measurement.c avrfat32/fat.c avrfat32/mmc.c avrfat32/file.c
-
+# SRC = $(TARGET).c adc.c csv.c led.c load.c uart.c datetime.c pwm.c fifo.c linearize.c xtoa.c measurement.c avrfat32/fat.c avrfat32/mmc.c avrfat32/file.c
+SRC = ./src/$(TARGET).c ./src/adc.c ./src/led.c ./src/load.c ./src/uart.c ./src/datetime.c ./src/pwm.c \
+		./src/xtoa.c ./src/fifo.c ./src/linearize.c ./src/measurement.c SoftI2CLib/i2csoft.c \
+		T123-master/EAT123_I2C.c
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -88,7 +89,7 @@ DEBUG = dwarf-2
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
-EXTRAINCDIRS =
+EXTRAINCDIRS = ./inc
 
 
 # Compiler flag to set the C Standard level.
@@ -102,7 +103,7 @@ CSTANDARD = -std=gnu99
 CDEFS =
 
 # Place -I options here
-CINCS =
+CINCS = 
 
 
 # Compiler flags.
@@ -186,7 +187,7 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = avrisp2
+AVRDUDE_PROGRAMMER = dragon_isp
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = usb    # programmer connected to serial device
@@ -223,7 +224,7 @@ AVRDUDE_FLAGS += $(AVRDUDE_ISP_DELAY)
 DIRAVR = c:/winavr
 DIRAVRBIN = $(DIRAVR)/bin
 DIRAVRUTILS = $(DIRAVR)/utils/bin
-DIRINC = .
+DIRINC = ./inc
 DIRLIB = $(DIRAVR)/avr/lib
 
 
