@@ -140,28 +140,12 @@ void chargeMppt(void)
     }
 }
 
-/*
- * 123456789012
- * 12.2V 10.1A
- * 12.2V 999mA
- * 34.1V  3.4A
- * 60°C charge
- */
-
-void showProcessValues(void) {
+void showVoltageAndCurrent(uint16_t voltage, uint16_t current){
     char bufferValue[15];
     char buffer[15];
     char outLine[15];
-//    size_t length;
 
-    //disable interrupts
-    cli();
-	//jump display cursor to first line first char.
-	T123home();
-    //enable interrupts
-    sei();
-
-	utoa(measurements.batteryVoltage.v, bufferValue, 10);
+	utoa(voltage, bufferValue, 10);
 
 	// pad string to given length with spaces on left side
 	strpad(outLine, bufferValue , 5, ' ', 0);
@@ -172,15 +156,13 @@ void showProcessValues(void) {
 
 	strcat(outLine," ");
 
-	measurements.chargeCurrent.v = 12345;
-
 	//convert charge current value to string
-	utoa(measurements.chargeCurrent.v, bufferValue, 10);
+	utoa(current, bufferValue, 10);
 
-	if(!(measurements.chargeCurrent.v < 1000)){
+	if(!(current < 1000)){
 		//since we cannot know the number of digits the current reading now has, we pad the string to
 		//five digits by adding spaces on the left side
-		strpad(buffer, bufferValue , 5, 'k', 0);
+		strpad(buffer, bufferValue , 5, ' ', 0);
 		// insert decimal point and unit
 		buffer[3] = buffer[2];
 		buffer[2] = '.';
@@ -189,7 +171,7 @@ void showProcessValues(void) {
 	else {
 		//since we cannot know the number of digits the current reading now has, we pad the string to
 		//five digits by adding spaces on the left side
-		strpad(buffer, bufferValue , 3, 'c', 0);
+		strpad(buffer, bufferValue , 3, ' ', 0);
 
 		// current value must have three or less digits. Just add the unit, "mA".
 		strcat(buffer,"mA");
@@ -200,15 +182,117 @@ void showProcessValues(void) {
 
     //disable interrupts
     cli();
-	//show output metric data: Intro, battery voltage, battery current
+	//show output metric data
 	T123writeStr(outLine);
     //enable interrupts
     sei();
 }
 
+void showTemperatureAndState(void){
+    char buffer[15];
+    char buffer2[15];
+
+	temperatureToA(measurements.temperature1.v, buffer);
+
+	//check if temperature value is valid
+	if(measurements.temperature1.v != UINT16_MAX){
+		//add "'C " to valid temperature value in buffer
+		strcat(buffer,"\x27""C ");
+	}
+	//don't add "'C" if temperature value is invalid.
+	else strcat(buffer," ");
+
+	//check if power electronics heat sink is too hot
+	if(chargerStatus & chargerStatus_overtemperature1){
+		//yes, append state "hot"
+		strcat(buffer,"hot");
+	}
+	else {
+		//show charger state
+		switch (chargerStatus & 0x03){
+		case chargerStatus_idle:
+			//tell user that charger is idle
+			strcat(buffer,"idle");
+			break;
+
+		case chargerStatus_charging:
+			//tell user that we are bulk charging
+			strcat(buffer,"bulk");
+			break;
+
+		case chargerStatus_full:
+			strcat(buffer,"float");
+			break;
+
+		default:
+			break;
+		}
+	}
+	utoa(chargerStatus,buffer2,16);
+	strcat(buffer,buffer2);
+    //disable interrupts
+    cli();
+	//show output on display
+	T123writeStr(buffer);
+    //enable interrupts
+    sei();
+}
+
+/*
+ * 123456789012
+ * 12.2V 10.1A
+ * 12.2V 999mA
+ * 34.1V  3.4A
+ * 60°C charge
+ */
+
+void showProcessValues(void) {
+//	char buffer[15];
+
+    //disable interrupts
+    cli();
+	//jump display cursor to first line first char.
+	T123home();
+    //enable interrupts
+    sei();
+
+    //display battery voltage and charge current in line 1
+    showVoltageAndCurrent(measurements.batteryVoltage.v, measurements.chargeCurrent.v);
+
+    // disable interrupts
+    cli();
+    //set cursor to start of second line; setCursor starts counting with 0.
+    T123setCursor(0,1);
+    //enable interrupts
+    sei();
+
+    //show panel voltage and current in line 2
+    showVoltageAndCurrent(measurements.panelVoltage.v, measurements.panelCurrent.v);
+
+    // disable interrupts
+    cli();
+    //set cursor to start of third line; setCursor starts counting with 0.
+    T123setCursor(0,2);
+    //enable interrupts
+    sei();
+
+    // show power electronics heat sink temperature and operating state of charger
+    showTemperatureAndState();
+/*
+    utoa(measurements.panelCurrent.adc,buffer,16);
+    // disable interrupts
+    cli();
+    //set cursor to start of third line; setCursor starts counting with 0.
+    T123writeStr(buffer);
+    //enable interrupts
+    sei();
+*/
+}
 
 int main(void)
 {
+	uint16_t countToDisplayUpdate = 0;
+
     // initialization
     led_init();
     pwm_init();
@@ -230,18 +314,10 @@ int main(void)
     sei();
 
     // say hello
-    uart_puts_P(PSTR(FIRMWARE_STRING " " FIRMWARE_VERSION_STRING "\n"));
-    
-    // csv style output
-    // csv_init();
-    // csv_writeHeader();
+//    uart_puts_P(PSTR(FIRMWARE_STRING " " FIRMWARE_VERSION_STRING "\n"));
 
     //wait some time to let display finish initialisation
     _delay_us(2200);
-
-    //say hello on Display
-//    char * Text = "Hi Caroline!\n";
-//    T123writeStr(Text);
 
     // main loop
     for (;;){
@@ -354,7 +430,16 @@ int main(void)
         
         led_update();
         // csv_write();
-        showProcessValues();
+
+        //check if 500 ms have expired since the last time we updated the process values
+        if(countToDisplayUpdate == 10){
+        	//show stuff on display
+        	showProcessValues();
+        	//clear counter
+        	countToDisplayUpdate = 0;
+        }
+        else
+        	countToDisplayUpdate++;
     }
     
 	return 0;

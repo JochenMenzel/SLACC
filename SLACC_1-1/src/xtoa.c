@@ -37,7 +37,8 @@ char* strpad(char* dst, char* src, uint8_t length, char padChar, uint8_t right)
 char* temperatureToA(uint16_t temp, char* dst)
 {
     char buffer[4];
-    uint16_t left, right;
+    uint16_t left;
+    //uint16_t right;
     
     // zero terminator
     dst[0] = 0;
@@ -56,16 +57,17 @@ char* temperatureToA(uint16_t temp, char* dst)
         temp -= TEMPERATURE_ZERO_DEG_C;
     
     left = temp / 100;
-    right = temp % 100;
+//    right = temp % 100;
     
     utoa(left, buffer, 10);
-    strcat(dst, buffer);
+    strpad(dst,buffer,3,' ',0);
+/*    strcat(dst, buffer);
     strcat(dst, ".");
-    if (left < 10)
+    if (right < 10)
         strcat(dst, "0");
     utoa(right, buffer, 10);
     strcat(dst, buffer);
-    
+ */
     return dst;
 }
 

@@ -24,14 +24,14 @@ Use Timer0 and Timer2 (both 8 Bit) for phase shifted pwm (16 MHz / 256 = 62.5 kH
 #define PWM_MEDIUM_F_BOTTOM         0
 #define PWM_MEDIUM_F_STEP           2
 #define PWM_MEDIUM_F_MAX            (PWM_MEDIUM_F_TOP - PWM_MEDIUM_F_STEP)    // maximum value one should set to keep boostrap working
-#define PWM_MEDIUM_F_MIN            (PWM_MEDIUM_F_TOP * 60UL / 100) // 60% is minimum
+#define PWM_MEDIUM_F_MIN            (PWM_MEDIUM_F_TOP * 30UL / 100) // 60% is minimum
 #define PWM_MEDIUM_F_INIT_OFFSET    (PWM_MEDIUM_F_TOP * 4UL / 100) // add 4% pwm value when guessing first pwm values
 // 125000 Hz
 #define PWM_HIGH_F_TOP              127
 #define PWM_HIGH_F_BOTTOM           0
 #define PWM_HIGH_F_STEP             1
 #define PWM_HIGH_F_MAX              (PWM_HIGH_F_TOP - PWM_HIGH_F_STEP)
-#define PWM_HIGH_F_MIN              (PWM_HIGH_F_TOP * 60UL / 100)
+#define PWM_HIGH_F_MIN              (PWM_HIGH_F_TOP * 30UL / 100)
 #define PWM_HIGH_F_INIT_OFFSET      (PWM_HIGH_F_TOP * 4UL / 100)
 
 

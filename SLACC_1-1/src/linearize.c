@@ -31,65 +31,63 @@ linearizationTableU16_t linListBattVoltage =
     {
         { 744,  2003}, 
         { 776,  3024},
-        {1120,  4512}, // we use a 2,5 reference (values below this have a lower accuracy)
-        {2244,  8980},
-        {2999, 12000},
-        {3503, 14000},
-        {4092, 16370},
+        {1120,  4412}, // we use a 2,5 reference (values below this have a lower accuracy)
+        {2244,  8800},
+        {2999, 11730},
+        {3503, 13690},
+        {4092, 15960},
     }
 };
 
 
-// Battery charge current (2012-04-24, Fluke F175)
-//    o------o---[47k]---o
+// Battery charge current (2017-08-03, 6mOhm shunt)
+//    o------o---[200k]---o
 //  INA169  ADC         GND
-// TODO: This measurement seems to have an offset of about 40mA.
-// Is there anything flowing back into the DCDC-converter?
+
 linearizationTableU16_t linListChargeCurrent =
 {
-    7,
-    { 
-        {   0,    45}, // -45mA in reality 
-        {  22,   101}, 
-        {  60,   200}, 
-        { 176,   498}, 
-        { 372,  1002}, 
-        { 763,  2001}, 
-        {4092, 10638}, // untested
-    }
+	6,
+	{
+			{0,0},
+			{512,1302},
+			{1024,2604},
+			{2048,5208},
+			{3072,7813},
+			{4092,10406},
+	}
 };
 
 
-// Solar panel current (2012-04-24, Fluke F175)
-//    o------o---[47k]---o
+// Solar panel current (2017-08-03, 16mOhm shunt)
+//    o------o---[180k]---o
 //  INA169  ADC         GND
 linearizationTableU16_t linListPanelCurrent =
 {
-    6,
-    {
-        {   0,     0}, 
-        {  79,   200}, 
-        { 196,   500}, 
-        { 388,  1000}, 
-        { 776,  2000}, 
-        {4092, 10638}, // untested
-    }
+	6,
+	{
+			{0,0},
+			{512,574},
+			{1024,1170},
+			{2048,2370},
+			{3072,3255},
+			{4092,4336},
+	}
 };
 
 
-// Solar panel voltage (2012-04-24, Fluke F175)
-//    o---[100k]---o---[12k]---o
+// Solar panel voltage (2017-08-02)
+//    o---[100k]---o---[5k6]---o
 // U_Batt         ADC         GND
 linearizationTableU16_t linListPanelVoltage =
 {
     6,
     {
         {   0,     0},
-        {1280,  7340},
-        {1751, 10000},
-        {2632, 15010},
-        {3512, 20000},
-        {4092, 23230},
+        {1280, 14732},
+        {1751, 20153},
+        {2632, 30293},
+        {3512, 40421},
+        {4092, 47097},
     }
 };
 

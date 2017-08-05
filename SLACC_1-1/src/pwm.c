@@ -113,7 +113,7 @@ void pwm_enable(void)
     
     // Timer/Counter Register
     TCNT0 = 0; // Timer0 - no phase shift
-    TCNT2 = (PWM_TOP + 1) + 1; // Timer1 - 180 deg phase shifted
+    TCNT2 = (PWM_TOP + 1) >> 1; // Timer1 - 180 deg phase shifted
 
     // TCCR0B – Timer/Counter Control Register B
     TCCR0B = timer0_ForceOutputCompare_none
