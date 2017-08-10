@@ -289,6 +289,20 @@ void showProcessValues(void) {
 */
 }
 
+//turn on / off fan connected via LED charge port
+//(meaning: we did not solder the green "charging" LED to the board, but a BSS138 n-channel mosfet
+//that switches a 80mm 24V fan. 24V fans run on 12V but nicely slow and quiet.)
+void fan_on(void){
+    // on
+    LED_CHARGE_PORT |= 1 << LED_CHARGE;
+}
+
+void fan_off(void){
+    // off
+    LED_CHARGE_PORT &= ~(1 << LED_CHARGE);
+}
+
+
 int main(void)
 {
 	uint16_t countToDisplayUpdate = 0;
@@ -428,8 +442,20 @@ int main(void)
             }
         }
         
-        led_update();
+        //led_update();
         // csv_write();
+
+	    //check if we need to turn on the cooling fan
+	    if ((measurements.temperature1.v >= TEMP1_FAN_ON) || ((measurements.temperature2.v >= TEMP2_FAN_ON))){
+	    	fan_on();
+	    }
+	    else
+			//check if we can turn off the cooling fan, again
+			if ((measurements.temperature1.v <= TEMP1_FAN_OFF) && ((measurements.temperature2.v <= TEMP2_FAN_OFF))){
+				fan_off();
+			};
+
+
 
         //check if 500 ms have expired since the last time we updated the process values
         if(countToDisplayUpdate == 10){

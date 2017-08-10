@@ -17,6 +17,10 @@
 #define TEMP3_SHUTDOWN      27315UL + 80 * 100
 #define TEMP3_RESTART       27315UL + 65 * 100
 
+#define TEMP1_FAN_ON        27315UL + 60 * 100
+#define TEMP1_FAN_OFF       27315UL + 50 * 100
+#define TEMP2_FAN_ON        27315UL + 60 * 100
+#define TEMP2_FAN_OFF       27315UL + 50 * 100
 
 #define BATT_U_MAX              14400 // [mV] voltage for full charge
 #define BATT_U_TICKLE_TOP       13800 // [mV] max voltage for tickle charging
