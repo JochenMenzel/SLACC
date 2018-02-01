@@ -63,7 +63,8 @@ TARGET = main
 # SRC = $(TARGET).c adc.c csv.c led.c load.c uart.c datetime.c pwm.c fifo.c linearize.c xtoa.c measurement.c avrfat32/fat.c avrfat32/mmc.c avrfat32/file.c
 SRC = ./src/$(TARGET).c ./src/adc.c ./src/led.c ./src/load.c ./src/uart.c ./src/datetime.c ./src/pwm.c \
 		./src/xtoa.c ./src/fifo.c ./src/linearize.c ./src/measurement.c SoftI2CLib/i2csoft.c \
-		T123-master/EAT123_I2C.c
+		./ST7032-master/ST7032.c
+#		T123-master/EAT123_I2C.c 
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s

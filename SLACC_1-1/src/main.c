@@ -15,7 +15,7 @@
 #include "datetime.h"
 #include "pwm.h"
 #include "measurement.h"
-#include "T123-master/EAT123_I2C.h"
+#include "ST7032-master/ST7032.h"
 
 /*
 SLACC - Solar lead acid charge controller firmware
@@ -26,9 +26,9 @@ fixes and optimizations by Dipl.-Ing. Jochen Menzel in July 2017
 TODO: On the fly frequency switching not implemented, yet!
 
 Fuse settings:
-efuse: 07
-hfuse: d9
-lfuse: f7
+efuse: 0xFC
+hfuse: 0xDF
+lfuse: 0xF7
 
 
 TODO in next HW revision:
@@ -183,7 +183,7 @@ void showVoltageAndCurrent(uint16_t voltage, uint16_t current){
     //disable interrupts
     cli();
 	//show output metric data
-	T123writeStr(outLine);
+	ST7032writeStr(outLine);
     //enable interrupts
     sei();
 }
@@ -233,7 +233,7 @@ void showTemperatureAndState(void){
     //disable interrupts
     cli();
 	//show output on display
-	T123writeStr(buffer);
+	ST7032writeStr(buffer);
     //enable interrupts
     sei();
 }
@@ -252,7 +252,7 @@ void showProcessValues(void) {
     //disable interrupts
     cli();
 	//jump display cursor to first line first char.
-	T123home();
+	ST7032home();
     //enable interrupts
     sei();
 
@@ -262,28 +262,29 @@ void showProcessValues(void) {
     // disable interrupts
     cli();
     //set cursor to start of second line; setCursor starts counting with 0.
-    T123setCursor(0,1);
+    ST7032setCursor(0,1);
     //enable interrupts
     sei();
 
     //show panel voltage and current in line 2
     showVoltageAndCurrent(measurements.panelVoltage.v, measurements.panelCurrent.v);
-
+/*
     // disable interrupts
     cli();
     //set cursor to start of third line; setCursor starts counting with 0.
-    T123setCursor(0,2);
+    ST7032setCursor(0,2);
     //enable interrupts
     sei();
 
     // show power electronics heat sink temperature and operating state of charger
     showTemperatureAndState();
+    */
 /*
     utoa(measurements.panelCurrent.adc,buffer,16);
     // disable interrupts
     cli();
     //set cursor to start of third line; setCursor starts counting with 0.
-    T123writeStr(buffer);
+    ST7032writeStr(buffer);
     //enable interrupts
     sei();
 */
@@ -322,8 +323,8 @@ int main(void)
     power_twi_disable();
 
     // initialize I2C communication and display
-    T123init(LCD_I2CADDRESS, 12, 4);
- 
+    ST7032init(16, 2, LCD_5x8DOTS);
+
     // enable interrupts
     sei();
 
@@ -331,6 +332,9 @@ int main(void)
 //    uart_puts_P(PSTR(FIRMWARE_STRING " " FIRMWARE_VERSION_STRING "\n"));
 
     //wait some time to let display finish initialisation
+    _delay_us(2200);
+
+    ST7032setContrast(5);
     _delay_us(2200);
 
     // main loop
@@ -458,7 +462,7 @@ int main(void)
 
 
         //check if 500 ms have expired since the last time we updated the process values
-        if(countToDisplayUpdate == 10){
+        if(countToDisplayUpdate == 50){
         	//show stuff on display
         	showProcessValues();
         	//clear counter

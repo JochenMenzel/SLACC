@@ -17,6 +17,7 @@ www.eXtremeElectronics.co.in
 #define Q_DEL _delay_loop_2(5)
 #define H_DEL _delay_loop_2(20)
 
+
 void SoftI2CInit(void) {
 	SDAPORT&=(1<<SDA);
 	SCLPORT&=(1<<SCL);

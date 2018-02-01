@@ -54,6 +54,7 @@
 //PCF2116 / EAT123-I2C bus address
 #define LCD_I2CADDRESS 0x74
 
+
 #define Rw 0b00100000  // Read/Write bit (1 read, 0 write)
 #define Rs 0b01000000  // Register select bit
 #define Co 0b10000000  // Command bit, set to one if last control byte in transmission and only data bytes follow.
