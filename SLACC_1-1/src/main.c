@@ -140,29 +140,45 @@ void chargeMppt(void)
     }
 }
 
+/*
+ * this function uses 5 chars for voltage, a space and 5 chars for current, e.g.
+ * "10,1V 10,5A". This uses 11 Chars of a display line.
+ */
 void showVoltageAndCurrent(uint16_t voltage, uint16_t current){
     char bufferValue[15];
     char buffer[15];
     char outLine[15];
 
-	utoa(voltage, bufferValue, 10);
+    //initialize outLine as zero-terminated string.
+    outLine[0] = 0;
 
-	// pad string to given length with spaces on left side
-	strpad(outLine, bufferValue , 5, ' ', 0);
+    //check if voltage is not zero.
+    if(voltage != 0){
 
-	outLine[3] = outLine[2];
-	outLine[2] = '.';
-	outLine[4] = 'V';
+		//convert unsigned int voltage to ascii string bufferValue, use radix 10
+		utoa(voltage, bufferValue, 10);
 
-	strcat(outLine," ");
+		// pad string to given length with spaces on left side
+		strpad(outLine, bufferValue , 5, ' ', 0);
 
-	//convert charge current value to string
+		outLine[3] = outLine[2];
+		outLine[2] = '.';
+		outLine[4] = 'V';
+
+		strcat(outLine," ");
+    }
+    else { //voltage _is_ zero.
+    	strcat(outLine," 0.0V ");
+    };
+
+    //convert charge current value to string
 	utoa(current, bufferValue, 10);
 
+	// do we need to show Ampere or is mA enough because we are below 1000mA?
 	if(!(current < 1000)){
 		//since we cannot know the number of digits the current reading now has, we pad the string to
 		//five digits by adding spaces on the left side
-		strpad(buffer, bufferValue , 5, ' ', 0);
+		strpad(buffer, bufferValue , 6, ' ', 0);
 		// insert decimal point and unit
 		buffer[3] = buffer[2];
 		buffer[2] = '.';
@@ -174,7 +190,7 @@ void showVoltageAndCurrent(uint16_t voltage, uint16_t current){
 		strpad(buffer, bufferValue , 3, ' ', 0);
 
 		// current value must have three or less digits. Just add the unit, "mA".
-		strcat(buffer,"mA");
+		strcat(buffer,"mA ");
 	}
 
 	//merge value into output line
@@ -188,24 +204,47 @@ void showVoltageAndCurrent(uint16_t voltage, uint16_t current){
     sei();
 }
 
-void showTemperatureAndState(void){
-    char buffer[15];
-    char buffer2[15];
+/*
+ * this function shows a temperature.
+ */
 
+void showTemperature(void){
+    char buffer[15];
+
+    //returns the temperature in °C padded to 3 chars or "None" if value is invalid.
 	temperatureToA(measurements.temperature1.v, buffer);
 
 	//check if temperature value is valid
 	if(measurements.temperature1.v != UINT16_MAX){
 		//add "'C " to valid temperature value in buffer
-		strcat(buffer,"\x27""C ");
+		strcat(buffer,"\xdf""C ");
 	}
 	//don't add "'C" if temperature value is invalid.
 	else strcat(buffer," ");
 
-	//check if power electronics heat sink is too hot
+    //disable interrupts
+    cli();
+	//show output on display
+	ST7032writeStr(buffer);
+    //enable interrupts
+    sei();
+}
+
+/*
+ * this function shows the charger state.
+ */
+
+void showState(void){
+    char buffer[15];
+//    char buffer2[15];
+
+    //initialize buffer as zero-terminated string
+    buffer[0] = 0;
+
+    //check if power electronics heat sink is too hot
 	if(chargerStatus & chargerStatus_overtemperature1){
 		//yes, append state "hot"
-		strcat(buffer,"hot");
+		strcat(buffer,"hot ");
 	}
 	else {
 		//show charger state
@@ -228,8 +267,8 @@ void showTemperatureAndState(void){
 			break;
 		}
 	}
-	utoa(chargerStatus,buffer2,16);
-	strcat(buffer,buffer2);
+//	utoa(chargerStatus,buffer2,16);
+//	strcat(buffer,buffer2);
     //disable interrupts
     cli();
 	//show output on display
@@ -259,6 +298,9 @@ void showProcessValues(void) {
     //display battery voltage and charge current in line 1
     showVoltageAndCurrent(measurements.batteryVoltage.v, measurements.chargeCurrent.v);
 
+    //display the heat sink temperature
+    showTemperature();
+
     // disable interrupts
     cli();
     //set cursor to start of second line; setCursor starts counting with 0.
@@ -268,6 +310,9 @@ void showProcessValues(void) {
 
     //show panel voltage and current in line 2
     showVoltageAndCurrent(measurements.panelVoltage.v, measurements.panelCurrent.v);
+
+    //show the charger's state
+    showState();
 /*
     // disable interrupts
     cli();
@@ -335,7 +380,7 @@ int main(void)
     _delay_us(2200);
 
     ST7032setContrast(5);
-    _delay_us(2200);
+    _delay_us(30);
 
     // main loop
     for (;;){
@@ -462,7 +507,7 @@ int main(void)
 
 
         //check if 500 ms have expired since the last time we updated the process values
-        if(countToDisplayUpdate == 50){
+        if(countToDisplayUpdate == 10){
         	//show stuff on display
         	showProcessValues();
         	//clear counter
