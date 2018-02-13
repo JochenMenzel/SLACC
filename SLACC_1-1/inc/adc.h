@@ -113,6 +113,10 @@ static inline void adc_disable(void)
     ADCSRA &= ~(1 << ADEN);
 };
 
+/*
+ * disable power to analog comparator
+ */
+void analog_comparator_disable(void);
 
 uint16_t adc_singleConversion(void);
 uint16_t adc_12BitConversion(uint8_t channel);

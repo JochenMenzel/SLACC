@@ -2,6 +2,8 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/power.h>
+#include <avr/wdt.h>
+#include <avr/sleep.h>
 #include <util/delay.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -78,6 +80,9 @@ void stopCharging(void)
     lastMppTime = 0;
     pwm = 0;
     pwm_disable();
+    //set our internal second-clock to zero. Thereby, we remember when we stopped charging:
+    // - we want to go to sleep after 15s.
+    datetime_set(0);
 }
 
 
@@ -267,23 +272,14 @@ void showState(void){
 			break;
 		}
 	}
-//	utoa(chargerStatus,buffer2,16);
-//	strcat(buffer,buffer2);
-    //disable interrupts
+
+	//disable interrupts
     cli();
 	//show output on display
 	ST7032writeStr(buffer);
     //enable interrupts
     sei();
 }
-
-/*
- * 123456789012
- * 12.2V 10.1A
- * 12.2V 999mA
- * 34.1V  3.4A
- * 60°C charge
- */
 
 void showProcessValues(void) {
 //	char buffer[15];
@@ -313,27 +309,117 @@ void showProcessValues(void) {
 
     //show the charger's state
     showState();
+}
+
 /*
-    // disable interrupts
+ * tell user that the SLACC went to sleep to save power while there is insufficient solar power output.
+ */
+void showSleepMessage(void){
+    char bufferValue[15];
+    char buffer[15];
+    char outLine[15];
+    uint32_t secondsInSleep;
+
+    //initialize some strings as zero-terminated string.
+    outLine[0] = 0;
+    buffer[0] = 0;
+
+	//disable interrupts
     cli();
-    //set cursor to start of third line; setCursor starts counting with 0.
-    ST7032setCursor(0,2);
+	//clear display
+	ST7032clear();
     //enable interrupts
     sei();
 
-    // show power electronics heat sink temperature and operating state of charger
-    showTemperatureAndState();
-    */
-/*
-    utoa(measurements.panelCurrent.adc,buffer,16);
-    // disable interrupts
+    //check if voltage is not zero.
+    if(measurements.batteryVoltage.v != 0){
+
+		//convert unsigned int voltage to ascii string bufferValue, use radix 10
+		utoa(measurements.batteryVoltage.v, bufferValue, 10);
+
+		// pad string to given length with spaces on left side
+		strpad(outLine, bufferValue , 5, ' ', 0);
+
+		outLine[3] = outLine[2];
+		outLine[2] = '.';
+		outLine[4] = 'V';
+
+		strcat(outLine," ");
+    }
+    else { //voltage _is_ zero.
+    	strcat(outLine," 0.0V ");
+    };
+
+	//check if voltage is not zero.
+	if(measurements.panelVoltage.v != 0){
+
+		//convert unsigned int voltage to ascii string bufferValue, use radix 10
+		utoa(measurements.panelVoltage.v, bufferValue, 10);
+
+		// pad string to given length with spaces on left side
+		strpad(buffer, bufferValue , 5, ' ', 0);
+
+		buffer[3] = buffer[2];
+		buffer[2] = '.';
+		buffer[4] = 'V';
+	}
+	else { //voltage _is_ zero.
+		strcat(buffer," 0.0V ");
+	};
+	// join strings that show panel voltage and battery voltage
+	strcat(outLine,buffer);
+
+    //disable interrupts
     cli();
-    //set cursor to start of third line; setCursor starts counting with 0.
-    ST7032writeStr(buffer);
+	//show battery voltage and panel voltage, they are in outLine as strings
+	ST7032writeStr(outLine);
+    //set cursor to start of second line; setCursor starts counting with 0.
+    ST7032setCursor(0,1);
     //enable interrupts
     sei();
-*/
+
+    //now show the time we spent in sleep, so far.
+    //clear outLine buffer
+    outLine[0] = 0;
+    //get time in sleep
+    secondsInSleep = datetime_getS();
+
+    //check if we spent more than one hour in sleep
+    if(secondsInSleep > 3600) {
+		//convert unsigned long second-clock to ascii string buffer, use radix 10
+		utoa(secondsInSleep / 3600, buffer, 10);
+		//copy number of hours to outLine buffer
+		strcat(outLine,buffer);
+		strcat(outLine,"h,");
+		//reduce time to show by the hours
+		secondsInSleep = secondsInSleep % 3600;
+    };
+
+    //now check if we spent more than one minute in sleep
+    if(secondsInSleep > 60){
+    	//convert unsigned long second-clock to ascii string buffer, use radix 10
+		utoa(secondsInSleep / 60, buffer, 10);
+		strcat(outLine,buffer);
+		strcat(outLine,"',");
+		//reduce time to show by the minutes
+		secondsInSleep = secondsInSleep % 60;
+    };
+
+    //show number of seconds in sleep (or the rest, after we told the user about hours and minutes)
+    utoa(secondsInSleep, buffer, 10);
+	strcat(outLine,buffer);
+	strcat(outLine,"\"");
+
+	//disable interrupts
+    cli();
+    //show seconds since entering sleep mode
+    ST7032writeStr(outLine);
+	//add the "seconds" SI unit.
+	ST7032writeStr(" zZZ.");
+    //enable interrupts
+    sei();
 }
+
 
 //turn on / off fan connected via LED charge port
 //(meaning: we did not solder the green "charging" LED to the board, but a BSS138 n-channel mosfet
@@ -348,6 +434,60 @@ void fan_off(void){
     LED_CHARGE_PORT &= ~(1 << LED_CHARGE);
 }
 
+/*
+ * activate watchdog, shutdown all other stuff and go to sleep
+ */
+void goToSleep (void){
+	//disable anything that uselessly burns power during sleep
+
+	//disable the ADC
+	adc_disable();
+	//power down the ADC
+	PRR |= (1<<PRADC);
+
+	//GPIO
+
+	//timers?
+
+	//disable interrupts
+	cli();
+	//reset watchdog-timer
+	wdt_reset();
+	// tell MCU that we legitimately want to change the watchdog configuration
+	WDTCSR = (1<<WDCE) | (1<<WDE);
+	//activate watchdog as interrupt source that triggers WDT ISR in 8 seconds.
+	WDTCSR = (1<<WDIE) | (1<<WDP3) | (1<<WDP0);
+
+	//select power down sleep mode. This sleep mode stops main clock, timers, MCU,..
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+
+	//enable interrupts
+	sei();
+	//deactivate brown-out detector
+	MCUCR = (1<<BODSE) | (1<<BODS);
+	MCUCR = (1<<BODS);
+	//go to sleep.
+	sleep_mode();
+
+	//power up the ADC
+	PRR &= !(1<<PRADC);
+	//initialize ADC
+    adc_init(adc_voltageReferenceAref, adc_adjustResultRight, adc_interruptDisabled, adc_autoTriggerDisabled,\
+    		 adc_autoTriggerSourceFreeRunning);
+	//re-activate ADC
+    adc_enable();
+}
+
+ISR(WDT_vect) {
+wdt_reset(); // reset watchdog counter
+//WDTCSR |= (1<<WDIE); // reenable interrupt to prevent system reset
+// update second clock by 8s.
+datetime_set(datetime_getS()+8);
+}
+
+void power_twi_spi_usart_disable(void){
+	PRR |= (1<<PRTWI) | (1<<PRSPI) | (1<<PRUSART0);
+}
 
 int main(void)
 {
@@ -359,14 +499,15 @@ int main(void)
     datetime_init();
     load_init();
     load_disconnect();
+    analog_comparator_disable();
     adc_init(adc_voltageReferenceAref, adc_adjustResultRight, adc_interruptDisabled, adc_autoTriggerDisabled,\
     		 adc_autoTriggerSourceFreeRunning);
     adc_enable();
-    uart_init();
-
+	#ifdef DEBUG_UART
+    	uart_init();
+	#endif
     // disable unneeded peripherals
-    power_twi_disable();
-
+    power_twi_spi_usart_disable();
     // initialize I2C communication and display
     ST7032init(16, 2, LCD_5x8DOTS);
 
@@ -490,7 +631,18 @@ int main(void)
 				#endif
             }
         }
-        
+
+	    //check if we stopped charging for more than 15s and want to go to power-save sleep
+	    if (datetime_getS() >= 15) {
+	    	//check if we are still not charging, again.
+	    	if (!(chargerStatus & chargerStatus_charging)){
+	    		//show user that we went to sleep.
+	    		showSleepMessage();
+	    		//shut down any ongoing stuff and go to sleep for 8s.
+	    		goToSleep();
+			}
+		}
+
         //led_update();
         // csv_write();
 

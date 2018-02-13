@@ -6,7 +6,7 @@
 #define FIRMWARE_DATE_STRING "2012-05-12"
 
 // If debug is defined we will compile uart functions.
-#define DEBUG_UART
+// #define DEBUG_UART
 
 
 // Define temperatures which trigger a charger shutdown/restart after shutdown

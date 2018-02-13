@@ -47,3 +47,10 @@ uint16_t adc_12BitConversion(uint8_t channel)
     return adc >> 2; // divide by 4
 }
 
+/*
+ * disable power to analog comparator
+ */
+void analog_comparator_disable(void){
+	//disable power to analog comparator in Analog Comparator Control and Status Register
+	ACSR = (1<<ACD);
+}
