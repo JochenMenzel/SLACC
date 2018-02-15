@@ -469,6 +469,9 @@ void goToSleep (void){
 	//go to sleep.
 	sleep_mode();
 
+	//disable the watchdog to prevent unwanted watchdog interrupts.
+	wdt_disable();
+
 	//power up the ADC
 	PRR &= !(1<<PRADC);
 	//initialize ADC
@@ -526,24 +529,24 @@ int main(void)
     // main loop
     for (;;){
         measure();
-        
-    	// connect/disconnet load
-	    if ((chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v < BATT_U_LOAD_DROP){
-            chargerStatus &= ~chargerStatus_loadConnected;
-            load_disconnect();
-			#ifdef DEBUG_UART
-            	uart_puts_P(PSTR("Status: Load disconnected (battery voltage too low)\n"));
-			#endif
-	    }
+		#ifdef USE_LOAD_SWITCH
+			// connect/disconnect load
+			if ((chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v < BATT_U_LOAD_DROP){
+				chargerStatus &= ~chargerStatus_loadConnected;
+				load_disconnect();
+				#ifdef DEBUG_UART
+					uart_puts_P(PSTR("Status: Load disconnected (battery voltage too low)\n"));
+				#endif
+			}
 
-	    else if (!(chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v >= BATT_U_LOAD_RECONNECT){
-            chargerStatus |= chargerStatus_loadConnected;
-            load_connect();
-			#ifdef DEBUG_UART
-            	uart_puts_P(PSTR("Status: Load connected (battery voltage sufficient)\n"));
-			#endif
-	    }
-
+			else if (!(chargerStatus & chargerStatus_loadConnected) && measurements.batteryVoltage.v >= BATT_U_LOAD_RECONNECT){
+				chargerStatus |= chargerStatus_loadConnected;
+				load_connect();
+				#ifdef DEBUG_UART
+					uart_puts_P(PSTR("Status: Load connected (battery voltage sufficient)\n"));
+				#endif
+			}
+		#endif
         // Detect overtemperatures
         if (measurements.temperature1.v != UINT16_MAX && measurements.temperature1.v >= TEMP1_SHUTDOWN)
             chargerStatus |= chargerStatus_overtemperature1;
