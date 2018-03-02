@@ -10,7 +10,7 @@
 #define LED_CHARGE          DDD6
 #define LED_U_RED_PORT      PORTB
 #define LED_U_RED_DDR       DDRB
-#define LED_U_RED           DDB0
+#define LED_U_RED           PB0
 #define LED_U_GREEN_PORT    PORTD
 #define LED_U_GREEN_DDR     DDRD
 #define LED_U_GREEN         DDD7

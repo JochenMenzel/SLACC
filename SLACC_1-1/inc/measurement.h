@@ -32,7 +32,7 @@ typedef struct
 {
     measurement16_t temperature1;   // [°K * 100]
     measurement16_t temperature2;   // [°K * 100]
-    measurement16_t temperature3;   // [°K * 100]
+    measurement16_t PTCsupply;   	// [mV] //supply voltage of PTCs for temperature 1 and temperature 2
     measurement16_t panelVoltage;   // [mV]
     measurement16_t panelCurrent;   // [mA]
     uint16_t panelPower;            // [W * 100]

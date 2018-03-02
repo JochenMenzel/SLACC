@@ -11,13 +11,14 @@ measurements_t measurements;
 void measure(void)
 {
     ADCAVG_SUM_TYPE adcSum;
+    uint32_t PTCcorrection;
 
     // ADC0 = temperature 3
     adcSum = 0;
     for (uint8_t i = 0; i < ADCAVG_SAMPLES; i++)
         adcSum += adc_12BitConversion(0);
-    measurements.temperature3.adc = adcSum / ADCAVG_SAMPLES;
-    measurements.temperature3.v = linearizeU16(&linListKty81210, measurements.temperature3.adc);
+    measurements.PTCsupply.adc = adcSum / ADCAVG_SAMPLES;
+//    measurements.PTCsupply.v = 5000 * measurements.PTCsupply.adc / 4096;
 
     // ADC1 = panel current
     adcSum = 0;
@@ -52,6 +53,9 @@ void measure(void)
     for (uint8_t i = 0; i < ADCAVG_SAMPLES; i++)
         adcSum += adc_12BitConversion(6);
     measurements.temperature1.adc = adcSum / ADCAVG_SAMPLES;
+    //correct for PTC halfbridge supply voltage that is unequal to 5.00 V
+    PTCcorrection = (long) measurements.temperature1.adc * (long)4095 / (long) measurements.PTCsupply.adc;
+    measurements.temperature1.adc = (uint16_t) PTCcorrection ;
     measurements.temperature1.v = linearizeU16(&linListKty81210, measurements.temperature1.adc);
     
     // ADC7 = temperature 2
@@ -59,6 +63,8 @@ void measure(void)
     for (uint8_t i = 0; i < ADCAVG_SAMPLES; i++)
         adcSum += adc_12BitConversion(7);
     measurements.temperature2.adc = adcSum / ADCAVG_SAMPLES;
+    PTCcorrection = (long) measurements.temperature2.adc * (long)4095 / (long) measurements.PTCsupply.adc;
+    measurements.temperature2.adc = (uint16_t) PTCcorrection ;
     measurements.temperature2.v = linearizeU16(&linListKty81210, measurements.temperature2.adc);
     
     // Compute values

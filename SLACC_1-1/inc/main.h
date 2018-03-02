@@ -50,7 +50,6 @@ typedef enum
     chargerStatus_loadConnected     = 1 << 2,
     chargerStatus_overtemperature1  = 1 << 5,
     chargerStatus_overtemperature2  = 1 << 6,
-    chargerStatus_overtemperature3  = 1 << 7
 } chargerStatus_t;
 
 

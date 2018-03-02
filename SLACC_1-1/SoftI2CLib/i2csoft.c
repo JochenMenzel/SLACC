@@ -19,8 +19,8 @@ www.eXtremeElectronics.co.in
 
 
 void SoftI2CInit(void) {
-	SDAPORT&=(1<<SDA);
-	SCLPORT&=(1<<SCL);
+	SDAPORT &= ~(1<<SDA);
+	SCLPORT &= ~(1<<SCL);
 	
 	SOFT_I2C_SDA_HIGH;	
 	SOFT_I2C_SCL_HIGH;	

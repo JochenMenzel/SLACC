@@ -153,13 +153,27 @@ void chargeMppt(void)
 //that switches a 80mm 24V fan. 24V fans run on 12V but nicely slow and quiet.)
 void fan_on(void){
     // on
-    LED_CHARGE_PORT |= 1 << LED_CHARGE;
+    LOAD_PORT |= 1 << LOAD_BIT;
+
 }
 
 void fan_off(void){
     // off
-    LED_CHARGE_PORT &= ~(1 << LED_CHARGE);
+    LOAD_PORT &= ~(1 << LOAD_BIT);
 }
+
+void PTC_ADCref_on(void){
+	// JMe hijacked the AtMega328's pin formerly connected to the red side of the DUO LED LD1
+	// set port bit to turn on power to the two PTC temperature sensors
+	LED_U_RED_PORT |= 1 << LED_U_RED;
+}
+
+void PTC_ADCref_off(void){
+	// JMe hijacked the AtMega328's pin formerly connected to the red side of the DUO LED LD1
+	// clear port bit to turn off power to the two PTC temperature sensors
+	LED_U_RED_PORT &= ~(1 << LED_U_RED);
+}
+
 
 /*
  * activate watchdog, shutdown all other stuff and go to sleep
@@ -173,7 +187,8 @@ void goToSleep (void){
 	PRR |= (1<<PRADC);
 
 	//GPIO
-
+	//turn off power to the PTC temperature sensors
+	PTC_ADCref_off();
 	//timers?
 
 	//disable interrupts
@@ -198,6 +213,12 @@ void goToSleep (void){
 
 	//disable the watchdog to prevent unwanted watchdog interrupts.
 	wdt_disable();
+
+	//restore power to the PTC temperature sensors and the external ADC reference voltage source
+	PTC_ADCref_on();
+
+	//wait 2ms for reference and PTC temperature sensor signals to stabilize
+	_delay_us(2500);
 
 	//power up the ADC
 	PRR &= !(1<<PRADC);
@@ -225,6 +246,7 @@ int main(void)
 
     // initialization
     led_init();
+    PTC_ADCref_on();
     pwm_init();
     datetime_init();
     load_init();
@@ -279,8 +301,6 @@ int main(void)
             chargerStatus |= chargerStatus_overtemperature1;
         if (measurements.temperature2.v != UINT16_MAX && measurements.temperature2.v >= TEMP2_SHUTDOWN)
             chargerStatus |= chargerStatus_overtemperature2;
-        if (measurements.temperature3.v != UINT16_MAX && measurements.temperature3.v >= TEMP3_SHUTDOWN)
-            chargerStatus |= chargerStatus_overtemperature3;
 
     	// Clear battery full-bit (charge to U_max next time)?
     	// Independent from charging status.
@@ -299,12 +319,6 @@ int main(void)
             else if (chargerStatus & chargerStatus_overtemperature2){
 				#ifdef DEBUG_UART
                 	uart_puts_P(PSTR("Status: Overtemperature 2, stopped charging\n"));
-				#endif
-                stopCharging();
-            }
-            else if (chargerStatus & chargerStatus_overtemperature3){
-				#ifdef DEBUG_UART
-                	uart_puts_P(PSTR("Status: Overtemperature 3, stopped charging\n"));
 				#endif
                 stopCharging();
             }
@@ -333,8 +347,7 @@ int main(void)
             }
         }
         else if (chargerStatus & chargerStatus_overtemperature1
-              || chargerStatus & chargerStatus_overtemperature2
-              || chargerStatus & chargerStatus_overtemperature3){
+              || chargerStatus & chargerStatus_overtemperature2){
 			#ifdef DEBUG_UART
             	uart_puts_P(PSTR("Status: Overtemperature.\n"));
 			#endif
@@ -343,8 +356,6 @@ int main(void)
                 chargerStatus &= ~chargerStatus_overtemperature1;
             if (measurements.temperature2.v <= TEMP2_RESTART)
                 chargerStatus &= ~chargerStatus_overtemperature2;
-            if (measurements.temperature3.v <= TEMP3_RESTART)
-                chargerStatus &= ~chargerStatus_overtemperature3;
         }
 	    else if (measurements.panelVoltage.v > measurements.batteryVoltage.v){
 	        // not charging, but panel voltage high enough...
@@ -372,9 +383,6 @@ int main(void)
 	    		goToSleep();
 			}
 		}
-
-        //led_update();
-        // csv_write();
 
 	    //check if we need to turn on the cooling fan
 	    if ((measurements.temperature1.v >= TEMP1_FAN_ON) || ((measurements.temperature2.v >= TEMP2_FAN_ON))){

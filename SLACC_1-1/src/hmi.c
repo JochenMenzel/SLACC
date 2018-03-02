@@ -53,11 +53,12 @@ void showVoltageAndCurrent(uint16_t voltage, uint16_t current){
 	if(!(current < 1000)){
 		//since we cannot know the number of digits the current reading now has, we pad the string to
 		//five digits by adding spaces on the left side
-		strpad(buffer, bufferValue , 6, ' ', 0);
+		strpad(buffer, bufferValue , 5, ' ', 0);
 		// insert decimal point and unit
 		buffer[3] = buffer[2];
 		buffer[2] = '.';
 		buffer[4] = 'A';
+		strcat(buffer," ");
 	}
 	else {
 		//since we cannot know the number of digits the current reading now has, we pad the string to
@@ -152,7 +153,7 @@ void showState(chargerStatus_t chargerStatus){
 }
 
 void showProcessValues(measurements_t measurements, chargerStatus_t chargerStatus) {
-//	char buffer[15];
+	//char buffer[15];
 
     //disable interrupts
     cli();
@@ -243,6 +244,14 @@ void showSleepMessage(measurements_t measurements){
     cli();
 	//show battery voltage and panel voltage, they are in outLine as strings
 	ST7032writeStr(outLine);
+	//enable interrupts
+	sei();
+
+	//show temperature
+	showTemperature(measurements.temperature1.v);
+
+	//disable interrupts
+	cli();
     //set cursor to start of second line; setCursor starts counting with 0.
     ST7032setCursor(0,1);
     //enable interrupts
@@ -260,7 +269,7 @@ void showSleepMessage(measurements_t measurements){
 		utoa(secondsInSleep / 3600, buffer, 10);
 		//copy number of hours to outLine buffer
 		strcat(outLine,buffer);
-		strcat(outLine,"h,");
+		strcat(outLine,"h ");
 		//reduce time to show by the hours
 		secondsInSleep = secondsInSleep % 3600;
     };
@@ -270,7 +279,7 @@ void showSleepMessage(measurements_t measurements){
     	//convert unsigned long second-clock to ascii string buffer, use radix 10
 		utoa(secondsInSleep / 60, buffer, 10);
 		strcat(outLine,buffer);
-		strcat(outLine,"',");
+		strcat(outLine,"' ");
 		//reduce time to show by the minutes
 		secondsInSleep = secondsInSleep % 60;
     };
@@ -278,14 +287,12 @@ void showSleepMessage(measurements_t measurements){
     //show number of seconds in sleep (or the rest, after we told the user about hours and minutes)
     utoa(secondsInSleep, buffer, 10);
 	strcat(outLine,buffer);
-	strcat(outLine,"\"");
+	strcat(outLine,"\" zZZ.");
 
 	//disable interrupts
     cli();
     //show seconds since entering sleep mode
     ST7032writeStr(outLine);
-	//add the "seconds" SI unit.
-	ST7032writeStr(" zZZ.");
     //enable interrupts
     sei();
 }
