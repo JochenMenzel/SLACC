@@ -165,10 +165,17 @@ void showProcessValues(measurements_t measurements, chargerStatus_t chargerStatu
     //display battery voltage and charge current in line 1
     showVoltageAndCurrent(measurements.batteryVoltage.v, measurements.chargeCurrent.v);
 
-    //display the heat sink temperature
-    showTemperature(measurements.temperature1.v);
+    //show heatsink or output capacitor temperature, whichever is higher
+    if(measurements.temperature1.v > measurements.temperature2.v) {
+		//display the heat sink temperature
+		showTemperature(measurements.temperature1.v);
+    }
+	else{
+		//display the output capacitor temperature
+		showTemperature(measurements.temperature2.v);
+	};
 
-    // disable interrupts
+	// disable interrupts
     cli();
     //set cursor to start of second line; setCursor starts counting with 0.
     ST7032setCursor(0,1);
