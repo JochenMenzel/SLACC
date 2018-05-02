@@ -18,6 +18,13 @@ Use Timer0 and Timer2 (both 8 Bit) for phase shifted pwm (16 MHz / 256 = 62.5 kH
 #define PWM_SHUTDOWN_DDR        DDRC
 #define PWM_SHUTDOWN_BIT        DDC3
 
+// TODO: modify hardware: split shutdown signal of gate drivers and let 180°-phase gate driver
+// have its own shutdown signal. Attention: move soft-I2C for display to other port, first!
+#define PWM_SHTDN_180_PORT       PORTB
+#define PWM_SHTDN_180_DDR        DDRB
+#define PWM_SHTDN_180_BIT        DDB1
+
+
 // We may never set pwm to 100% because the MosFet bootstrap wouldn't work anymore
 // 970 Hz / 62500 Hz
 #define PWM_MEDIUM_F_TOP            255
@@ -31,7 +38,7 @@ Use Timer0 and Timer2 (both 8 Bit) for phase shifted pwm (16 MHz / 256 = 62.5 kH
 #define PWM_HIGH_F_BOTTOM           0
 #define PWM_HIGH_F_STEP             1
 #define PWM_HIGH_F_MAX              (PWM_HIGH_F_TOP - PWM_HIGH_F_STEP)
-#define PWM_HIGH_F_MIN              (PWM_HIGH_F_TOP * 30UL / 100)
+#define PWM_HIGH_F_MIN              (PWM_HIGH_F_TOP * 25UL / 100)
 #define PWM_HIGH_F_INIT_OFFSET      (PWM_HIGH_F_TOP * 4UL / 100)
 
 

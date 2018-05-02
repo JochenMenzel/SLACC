@@ -14,8 +14,10 @@ www.eXtremeElectronics.co.in
 
 //#define Q_DEL _delay_loop_2(3)
 //#define H_DEL _delay_loop_2(5)
-#define Q_DEL _delay_loop_2(5)
-#define H_DEL _delay_loop_2(20)
+//#define Q_DEL _delay_loop_2(5)
+//#define H_DEL _delay_loop_2(20)
+#define Q_DEL _delay_loop_2(15)
+#define H_DEL _delay_loop_2(60)
 
 
 void SoftI2CInit(void) {

@@ -36,7 +36,7 @@ lfuse: 0xF7
 
 TODO in next HW revision:
 - 24V input voltage (12V regulator for mosfet-driver)
-- Ability do shut down 180 deg phase for I_Charge < 1A (efficiency)
+- Ability to shut down 180 deg phase for I_Charge < 1A (efficiency)
 - 3.3V design with XMEGA (12 bit ADC, 10 Bit pwm, PLL?)
 - Ability to cut supply for voltage/current sensing
 - Filter AVCC
@@ -86,7 +86,9 @@ void stopCharging(void)
     datetime_set(0);
 }
 
-
+// TODO: remove check for low panel current from this function and establish this check in main()'s charge
+// state machine. Add panel current hysteresis for switching between pass-through and MPPT. Set PWM to start
+// value as in start_charging() when shifting from pass-through to MPPT.
 // Control maximum power point charging
 void chargeMppt(void)
 {
@@ -97,12 +99,15 @@ void chargeMppt(void)
         lastMppTime += MPPT_INTERVAL; // overflow
     if (uptime - lastMppTime >= MPPT_INTERVAL)
     {
+
         lastMppTime = uptime;
 
         if (measurements.panelCurrent.v < MPPT_CURRENT_MIN)
         {
             // do not make use of MPPT because there seems to be little sun
-            pwm = UINT8_MAX;
+        	//let PWM duty cycle drift towards PWM_MAX until it reaches 99.2% or the panel current
+        	//exceeds MPPT_CURRENT_MIN, again.
+        	pwm_stepUp();
             pwmDirection = mppt_direction_pwmUp;
         }
         else

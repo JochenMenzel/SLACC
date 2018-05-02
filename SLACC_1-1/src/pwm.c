@@ -11,6 +11,8 @@ void pwm_init(void)
     // configure pwm pins as output
     DDRD |= 1 << DDD5 | 1 << DDD3; // OC0B, OC2B
 
+    Hier unbedingt auch PWM SHTDN 180° initialisieren!!
+
     // Timer/Counter2 Interrupt Mask Register
     TIMSK0 = timer0_Interrupt_none;    
     TIMSK2 = timer2_Interrupt_none;
@@ -67,7 +69,7 @@ uint8_t pwm_stepDown(void)
     else if (pwm - PWM_MIN >= PWM_STEP)
         pwm -= PWM_STEP;
     else
-        pwm = PWM_MAX;
+        pwm = PWM_MIN;
         
     OCR0B = OCR2B = pwm;
     

@@ -102,11 +102,13 @@ void command(uint8_t);
 
 /********** high level commands, for the user! */
 
-// clear() - clear display, set cursor position to zero
+/*
+ *  clear() - clear display, set cursor position to zero
+ *  Attention: the EAT-123 needs 2ms to complete this command. Make sure to wait this time before issuing the
+ *  next I2C commands to the display.
+ */
 void T123clear(){
 	command(LCD_CLEARDISPLAY);
-	//JMe TODO: find some other way to wait 2ms or move responsibility for waiting to higher application.
-//	delayMicroseconds(2000);   // this command takes a long time!
 }
 
 // home() - set cursor position to zero

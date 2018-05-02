@@ -24,8 +24,8 @@ I/O Configuration
 #define SCLPIN	PIND	//TAKE PORTD TO READ DATA
 #define SDAPIN	PINB	//TAKE PORTB TO READ DATA
 
-#define SCL	PD4		//PORTD.4 PIN AS SCL PIN
-#define SDA	PB1		//PORTB.1 PIN AS SDA PIN
+#define SCL	PD4		//PORTD.4 PIN AS SCL PIN, green wire
+#define SDA	PB1		//PORTB.1 PIN AS SDA PIN, white wire
 
 
 #define SOFT_I2C_SDA_LOW	SDADDR|=((1<<SDA))
