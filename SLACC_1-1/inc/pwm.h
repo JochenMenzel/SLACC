@@ -14,16 +14,15 @@ Use Timer0 and Timer2 (both 8 Bit) for phase shifted pwm (16 MHz / 256 = 62.5 kH
     #error "I don't know hot to set up pmw-timers."
 #endif
 
-#define PWM_SHUTDOWN_PORT       PORTC
-#define PWM_SHUTDOWN_DDR        DDRC
-#define PWM_SHUTDOWN_BIT        DDC3
+//define register access for shutdown signal of the 0� buck stage
+#define PWM_SHTDN_0_PORT       PORTC
+#define PWM_SHTDN_0_DDR        DDRC
+#define PWM_SHTDN_0_BIT        DDC3
 
-// TODO: modify hardware: split shutdown signal of gate drivers and let 180°-phase gate driver
-// have its own shutdown signal. Attention: move soft-I2C for display to other port, first!
+//define register access for shutdown signal of the 180� buck stage
 #define PWM_SHTDN_180_PORT       PORTB
 #define PWM_SHTDN_180_DDR        DDRB
 #define PWM_SHTDN_180_BIT        DDB1
-
 
 // We may never set pwm to 100% because the MosFet bootstrap wouldn't work anymore
 // 970 Hz / 62500 Hz
@@ -31,7 +30,7 @@ Use Timer0 and Timer2 (both 8 Bit) for phase shifted pwm (16 MHz / 256 = 62.5 kH
 #define PWM_MEDIUM_F_BOTTOM         0
 #define PWM_MEDIUM_F_STEP           2
 #define PWM_MEDIUM_F_MAX            (PWM_MEDIUM_F_TOP - PWM_MEDIUM_F_STEP)    // maximum value one should set to keep boostrap working
-#define PWM_MEDIUM_F_MIN            (PWM_MEDIUM_F_TOP * 30UL / 100) // 60% is minimum
+#define PWM_MEDIUM_F_MIN            (PWM_MEDIUM_F_TOP * 25UL / 100) // 25% is minimum
 #define PWM_MEDIUM_F_INIT_OFFSET    (PWM_MEDIUM_F_TOP * 4UL / 100) // add 4% pwm value when guessing first pwm values
 // 125000 Hz
 #define PWM_HIGH_F_TOP              127
@@ -49,7 +48,6 @@ Use Timer0 and Timer2 (both 8 Bit) for phase shifted pwm (16 MHz / 256 = 62.5 kH
 #define PWM_MAX                     PWM_HIGH_F_MAX
 #define PWM_MIN                     PWM_HIGH_F_MIN
 #define PWM_INIT_OFFSET             PWM_HIGH_F_INIT_OFFSET
-
 
 typedef enum
 {
@@ -186,8 +184,9 @@ void pwm_set(uint8_t pwm);
 uint8_t pwm_stepDown(void);
 uint8_t pwm_stepUp(void);
 uint8_t pwm_get(void);
-void pwm_disable(void);
-void pwm_enable(void);
-
+void pwm_0deg_disable(void);
+void pwm_180deg_disable(void);
+void pwm_0deg_enable(pwm_frequency_t pwm_frequency);
+void pwm_180deg_enable(pwm_frequency_t pwm_frequency);
 #endif
 

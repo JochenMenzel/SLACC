@@ -71,7 +71,8 @@ void startCharging(void)
     if (pwm < PWM_MIN)
         pwm = PWM_MIN;
     pwm_set(pwm);
-    pwm_enable();
+    pwm_0deg_enable(pwm_frequencyHigh);
+    pwm_180deg_enable(pwm_frequencyHigh);
 }
 
 
@@ -80,7 +81,8 @@ void stopCharging(void)
     chargerStatus &= ~chargerStatus_charging;
     lastMppTime = 0;
     pwm = 0;
-    pwm_disable();
+    pwm_0deg_disable();
+    pwm_180deg_disable();
     //set our internal second-clock to zero. Thereby, we remember when we stopped charging:
     // - we want to go to sleep after 15s.
     datetime_set(0);
@@ -107,8 +109,10 @@ void chargeMppt(void)
             // do not make use of MPPT because there seems to be little sun
         	//let PWM duty cycle drift towards PWM_MAX until it reaches 99.2% or the panel current
         	//exceeds MPPT_CURRENT_MIN, again.
-        	pwm_stepUp();
-            pwmDirection = mppt_direction_pwmUp;
+        	if (pwm < PWM_MAX - 4){
+				pwm_stepUp();
+				pwmDirection = mppt_direction_pwmUp;
+        	}
         }
         else
         {

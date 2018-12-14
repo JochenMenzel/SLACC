@@ -34,7 +34,9 @@
 #define CHARGE_PANEL_CURRENT_MIN        20 // [mA]
 
 // TODO: On the fly switching not implemented, yet!
-#define MPPT_CURRENT_MIN                70 // TODO: Replace by switching between PANEL_CURRENT_MINIMAL_F_UP and PANEL_CURRENT_NORMAL_F_DOWN!
+#define MPPT_CURRENT_MIN                200 // TODO: Replace by switching between PANEL_CURRENT_MINIMAL_F_UP and PANEL_CURRENT_NORMAL_F_DOWN!
+#define PANEL_CURRENT_ACTIVATE_180DEG	525 // [mA] activate 180°-phase power stage when panel current exceeds this value
+#define PANEL_CURRENT_SHTDN_180DEG		475 // [mA] shut down 180°-phase power stage when panel current is below this value
 // Efficiency depends on available current. In minimum frequency mode we do not use MPPT
 #define PANEL_CURRENT_MINIMAL_F_UP      350 // [mA] minimal -> normal (125 kHz)
 #define PANEL_CURRENT_NORMAL_F_DOWN     250 // [mA] normal -> minimal (970 Hz)
