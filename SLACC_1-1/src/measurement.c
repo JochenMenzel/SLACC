@@ -78,3 +78,4 @@ void measure(void)
         measurements.efficiency = UINT16_MAX; // more than 100% efficiency would not make sense
 }
 
+

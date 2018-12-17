@@ -107,7 +107,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="src/timer2.c|src/time.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="src/csv.c|src/main2.c|src/timer2.c|src/time.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
@@ -223,7 +223,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="src/timer2.c|src/time.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="src/csv.c|src/main2.c|src/timer2.c|src/time.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				

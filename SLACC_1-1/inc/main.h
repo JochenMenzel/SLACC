@@ -22,16 +22,8 @@
 #define TEMP2_FAN_ON        27315UL + 60 * 100
 #define TEMP2_FAN_OFF       27315UL + 50 * 100
 
-#define BATT_U_MAX              14400 // [mV] voltage for full charge
-#define BATT_U_TICKLE_TOP       13800 // [mV] max voltage for tickle charging
-#define BATT_U_TICKLE_BOTTOM    12500 // [mV] restart tickle charging here
-#define BATT_U_RECHARGE         12400 // [mV] clear "full"-bit below this voltage (should be close to BATT_U_TICKLE_BOTTOM)
-#define BATT_U_LOAD_RECONNECT   11500 // [mV] 
-#define BATT_U_LOAD_DROP        10500 // [mV] depends heavily on load!
 
-
-#define MPPT_INTERVAL                   1 // [s]
-#define CHARGE_PANEL_CURRENT_MIN        20 // [mA]
+//#define CHARGE_PANEL_CURRENT_MIN        20 // [mA]
 
 // TODO: On the fly switching not implemented, yet!
 #define MPPT_CURRENT_MIN                200 // TODO: Replace by switching between PANEL_CURRENT_MINIMAL_F_UP and PANEL_CURRENT_NORMAL_F_DOWN!
@@ -43,7 +35,6 @@
 #define PANEL_CURRENT_NORMAL_F_UP       5850 // [mA] normal -> high (62.5 kHz)
 #define PANEL_CURRENT_HIGH_F_DOWN       5300 // [mA] high -> normal (125 kHz)
 
-
 typedef enum
 {
     chargerStatus_idle              = 0,
@@ -51,7 +42,7 @@ typedef enum
     chargerStatus_full              = 1 << 1, // use tickle charging when full
     chargerStatus_loadConnected     = 1 << 2,
     chargerStatus_overtemperature1  = 1 << 5,
-    chargerStatus_overtemperature2  = 1 << 6,
+    chargerStatus_overtemperature2  = 1 << 6
 } chargerStatus_t;
 
 
@@ -63,7 +54,7 @@ typedef enum
 } mppt_direction_t;
 
 
-extern chargerStatus_t chargerStatus;
+//extern chargerStatus_t chargerStatus;
 extern uint8_t pwm;
 
 #endif

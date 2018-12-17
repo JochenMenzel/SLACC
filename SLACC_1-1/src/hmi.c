@@ -11,6 +11,7 @@
 #include <string.h>
 #include "xtoa.h"
 #include "measurement.h"
+#include "charger.h"
 #include "datetime.h"
 #include "main.h"
 #include "ST7032-master/ST7032.h"
@@ -132,7 +133,23 @@ void showState(chargerStatus_t chargerStatus){
 
 		case chargerStatus_charging:
 			//tell user that we are bulk charging
-			strcat(buffer,"bulk");
+
+			switch(charger_get_state()){
+			case CHG_IDLE:
+				break;
+			case CHG_CC:
+				strcat(buffer,"CC");
+				break;
+			case CHG_CV:
+				strcat(buffer,"CV");
+				break;
+			case CHG_TRICKLE:
+				strcat(buffer,"TRICL");
+				break;
+			default:
+				strcat(buffer,"bulk");
+				break;
+			}
 			break;
 
 		case chargerStatus_full:
@@ -152,7 +169,7 @@ void showState(chargerStatus_t chargerStatus){
     sei();
 }
 
-void showProcessValues(measurements_t measurements, chargerStatus_t chargerStatus) {
+void showProcessValues(measurements_t measurements) {
 	//char buffer[15];
 
     //disable interrupts
@@ -186,7 +203,7 @@ void showProcessValues(measurements_t measurements, chargerStatus_t chargerStatu
     showVoltageAndCurrent(measurements.panelVoltage.v, measurements.panelCurrent.v);
 
     //show the charger's state
-    showState(chargerStatus);
+    showState(getChargerStatus());
 }
 
 /*
