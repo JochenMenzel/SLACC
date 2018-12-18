@@ -136,15 +136,16 @@ void showState(chargerStatus_t chargerStatus){
 
 			switch(charger_get_state()){
 			case CHG_IDLE:
+				strcat(buffer,"IDLE");
 				break;
 			case CHG_CC:
-				strcat(buffer,"CC");
+				strcat(buffer,"  CC");
 				break;
 			case CHG_CV:
-				strcat(buffer,"CV");
+				strcat(buffer,"  CV");
 				break;
 			case CHG_TRICKLE:
-				strcat(buffer,"TRICL");
+				strcat(buffer,"TRCL");
 				break;
 			default:
 				strcat(buffer,"bulk");

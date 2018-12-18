@@ -24,11 +24,12 @@
 #include "datetime.h"
 
 uint32_t dcdc_power;    // stores previous output power
-uint8_t MPPT_direction_up = 0;
+uint8_t MPPT_direction_up = 0xFF;
 
 void update_mppt(measurements_t * measurements, ChargingProfile * profile)
 {
     uint32_t dcdc_power_new = measurements->panelPower;
+    //uint32_t dcdc_power_new = measurements->chargePower;
 
 //    if (dcdc_enabled() == false && charger_charging_enabled() == true
     if (!isCharging()
@@ -64,6 +65,14 @@ void update_mppt(measurements_t * measurements, ChargingProfile * profile)
         	//exceeds MPPT_CURRENT_MIN, again.
         	if (pwm < PWM_MAX - 4){
 				pwm_stepUp();
+				//make sure that the MPPT algorithm decides towards rising PWM in the next iteration.
+				MPPT_direction_up = 0xFF;
+				/*
+				 * setting dcdc_power_new to zero here will cause dcdc_power to become zero at the end
+				 * of the function. That helps, to let the MPPT algorithm skip the "is old_power larger
+				 * than new power" check and will prevent it from inverting MPPT_direction_up.
+				 */
+				dcdc_power_new = 0;
         	}
         }
         else {

@@ -68,9 +68,9 @@ void measure(void)
     measurements.temperature2.v = linearizeU16(&linListKty81210, measurements.temperature2.adc);
     
     // Compute values
-    uint32_t chargePowerPrecise = (uint32_t)measurements.batteryVoltage.v * (uint32_t)measurements.chargeCurrent.v;
+    uint64_t chargePowerPrecise = (uint32_t)measurements.batteryVoltage.v * (uint32_t)measurements.chargeCurrent.v;
     measurements.panelPower = (uint16_t)((uint32_t)measurements.panelVoltage.v * (uint32_t)measurements.panelCurrent.v / 10000UL);
-    measurements.chargePower = (uint16_t)(chargePowerPrecise / 10000UL);
+    measurements.chargePower = (uint16_t)(chargePowerPrecise / (uint64_t)10000);
     
     if (measurements.panelPower > measurements.chargePower)
         measurements.efficiency = (uint16_t)(chargePowerPrecise / measurements.panelPower);
