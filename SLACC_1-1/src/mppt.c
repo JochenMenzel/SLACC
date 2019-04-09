@@ -61,6 +61,24 @@ void update_mppt(measurements_t * measurements, ChargingProfile * profile)
         }
         else if (measurements->panelCurrent.v < profile->mppt_panel_current_min) {
             // do not make use of MPPT because there seems to be little sun and we have veery low panel current.
+
+        	/*
+			 * if pwm < PWM_TOP * battery voltage / panel voltage, we need to correct the duty cycle or we
+			 * will see current flow from the battery through the charger into the panel.
+			 * Check if charge current is approximately same as panel current. If not, increase PWM duty cycle.
+			 * We compare panel current against charge current + 10 mA because an active SLACC consumes 10 mA
+			 * for its own circuitry.
+			 */
+        	if(measurements->panelCurrent.v > measurements->chargeCurrent.v + 10){
+        		/*
+        		 * additionally increase pwm duty cycle
+        		 */
+        	    // Guess initial pwm setting: pwm = batteryVoltage * PWM_TOP / panelVoltage + offset
+        	    pwm = (uint16_t)(((uint32_t)measurements->batteryVoltage.v * PWM_TOP) / measurements->panelVoltage.v) + PWM_INIT_OFFSET;
+        	    if (pwm > PWM_MAX-4)
+        	    	pwm = PWM_MAX-4;
+        	}
+
         	//let PWM duty cycle drift towards PWM_MAX until it reaches 99.2% or the panel current
         	//exceeds MPPT_CURRENT_MIN, again.
         	if (pwm < PWM_MAX - 4){

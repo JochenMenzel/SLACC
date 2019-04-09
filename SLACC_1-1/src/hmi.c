@@ -139,7 +139,8 @@ void showState(chargerStatus_t chargerStatus){
 				strcat(buffer,"IDLE");
 				break;
 			case CHG_CC:
-				strcat(buffer,"  CC");
+//				strcat(buffer,"  CC");
+				utoa(pwm,buffer,10);
 				break;
 			case CHG_CV:
 				strcat(buffer,"  CV");

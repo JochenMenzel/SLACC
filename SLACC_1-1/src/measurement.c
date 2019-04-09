@@ -27,6 +27,7 @@ void measure(void)
     measurements.panelCurrent.adc = adcSum / ADCAVG_SAMPLES;
     measurements.panelCurrent.v = linearizeU16(&linListPanelCurrent, measurements.panelCurrent.adc);
 
+
     // ADC2 = panel voltage
     adcSum = 0;
     for (uint8_t i = 0; i < ADCAVG_SAMPLES; i++)
@@ -47,6 +48,15 @@ void measure(void)
         adcSum += adc_12BitConversion(5);
     measurements.chargeCurrent.adc = adcSum / ADCAVG_SAMPLES;
     measurements.chargeCurrent.v = linearizeU16(&linListChargeCurrent, measurements.chargeCurrent.adc);
+    /* correct offset */
+    #define CHARGECURRENTOFFSET 40 // offset in mA. Will be subtracted in measurement.c
+
+    if (measurements.chargeCurrent.v > CHARGECURRENTOFFSET) {
+    	measurements.chargeCurrent.v = measurements.chargeCurrent.v - CHARGECURRENTOFFSET;
+    }
+    else {
+    	measurements.chargeCurrent.v = 0;
+    }
 
     // ADC6 = temperature 1
     adcSum = 0;

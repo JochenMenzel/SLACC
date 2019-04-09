@@ -56,7 +56,7 @@ linearizationTableU16_t linListChargeCurrent =
 			{4092,10406},
 	}
 };
-
+// observe: CHARGECURRENTOFFSET, offset in mA. Will be subtracted in measurement.c
 
 // Solar panel current (2017-08-03, 16mOhm shunt)
 //    o------o---[180k]---o
@@ -73,7 +73,6 @@ linearizationTableU16_t linListPanelCurrent =
 			{4092,4336},
 	}
 };
-
 
 // Solar panel voltage (2017-08-02)
 //    o---[100k]---o---[5k6]---o
