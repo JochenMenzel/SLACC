@@ -15,7 +15,7 @@ The combined key design features are:
 
 # intended audience
 
-This project is not a design-set for a ready-made product. It addresses developers with a background in embedded systems and power electronics. Having said that, i nevertheless encourage readers to build their own SLACC and gather useful and interesting experience along the way. Also feedback and contributions are welcome!
+This project is not a design-set for a ready-made product. It addresses developers with a background in embedded systems and power electronics. Feedback and contributions are welcome! If you decide to built a solar charge controler, take a look at the libre solar project, first. The designs published there are more up-to-date than this project.
 
 # real-life experiences
 
@@ -72,7 +72,7 @@ The following lists the changes i made to the original board design SLACC 1-1 by
     * use Anderson Powerpole 30A red and black for positive and negative lead to the battery
     * have a 10A car fuse in your camper's battery box for the SLACC (or one for each SLACC if you use several..)
 
-# firmware
+# firmware reference
 The firmware bases on the work of others:
 
 * Frank Bättermann's original [source code](https://www.ich-war-hier.de/elektronik/elektronik-2012/slacc-solar-lead-acid-charge-controller/) for the SLACC
@@ -80,7 +80,7 @@ The firmware bases on the work of others:
 * an I2C soft-stack [i2csoft](https://extremeelectronics.co.in/avr-tutorials/software-i2c-library-for-avr-mcus/)
 * a display library [ST7032](http://ore-kb.net/archives/195)
 
-Changes i made and hints
+# firmware changes and hints
 
 * configuration values and thresholds are in main.h
 * the original charger algorithm emphasized full-cycle use of the batteries. I.e. it let the batteries drain down to approx. 10% SOC, then recharged to 100%SOC. This unsatisfactory in combination with solar power: During mornings, the batteries reached full charge and the SLACC turned off. Then, during the day, the SLACC did not route solar power to water pump, refridgerator cooling fan, lighting etc. but instead let me drain the batteries. As a fix, i adopted the [charge state machine](https://libre.solar/charge-controller-firmware/src/overview/charger_concepts.html#charger-state-machine) from libre solar.
@@ -96,3 +96,9 @@ is because the actual supply voltage of the sensors is not +5.00V but 4.89V (or 
 # future work
 * for some strange reason, i commented out the switch-off of the ADC reference voltage and the temperature sensors. I do not remember why - possibly the power saving effect was less than expected. I need to check this, again.
 * there may be some efficiency gains in reducing the switching frequency in low and maybe high load conditions. The prep work for adaptive switching frequency already is in the code. Analyze the effiency input to output under various load conditions for two or three switching frequencies, in the future.
+
+# documentation
+* this README
+* Frank Bättermann`s article on the original design
+* the documentation of the libre solar project
+* i had ten boards made according to Frank Battermann's original eagle design. There are pictures of my modifications to these PCBs in the documentation folder. There are also pictures of my three SLACC builds.
