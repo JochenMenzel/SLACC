@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 2023 Dipl.-Ing. Jochen Menzel (Jehdar@gmx.de)
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>

@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2023 2023 Dipl.-Ing. Jochen Menzel (Jehdar@gmx.de)
+// SPDX-FileCopyrightText: 2023 CPRGHT_BM
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <avr/pgmspace.h>

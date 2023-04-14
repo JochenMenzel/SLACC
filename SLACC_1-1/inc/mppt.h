@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 2019 Dr. Martin Jäger (https://libre.solar)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /*
  * mppt.h
  *

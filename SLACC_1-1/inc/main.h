@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 2023 Dipl.-Ing. Jochen Menzel (Jehdar@gmx.de)
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef _MAIN_H__
 #define _MAIN_H__
 

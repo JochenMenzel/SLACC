@@ -1,12 +1,5 @@
-/**********************************************************
-
-Software I2C Library for AVR Devices.
-
-Copyright 2008-2012
-eXtreme Electronics, India
-www.eXtremeElectronics.co.in
-**********************************************************/
-
+// Copyright 2008-2012
+// SPDX-FileCopyrightText: 2023 2008-20012 eXtreme Electronics, India (https://extremeelectronics.co.in/)
 
 #ifndef _I2CSOFT_H
 #define _I2CSOFT_H

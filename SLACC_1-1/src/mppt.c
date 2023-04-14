@@ -1,21 +1,7 @@
-/*
- * mppt.c
- *
- * LibreSolar MPPT charge controller mppt algorithm
- * Copyright (c) 2016-2018 Martin Jäger (www.libre.solar)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright (c) 2016-2018 Martin Jäger (www.libre.solar)
+// SPDX-FileCopyrightText: 2023 2019 Dr. Martin Jäger (https://libre.solar)
+//
+// SPDX-License-Identifier: Apache-2.0
 
 #include "mppt.h"
 #include "measurement.h"

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 2019 tomozh http://ore-kb.net/archives/195
+//
+// SPDX-License-Identifier: MIT
+
 /*
 	ST7032 I2C LCD control sample
 	Original source : Cursor.ino (LiquidCrystal Library)

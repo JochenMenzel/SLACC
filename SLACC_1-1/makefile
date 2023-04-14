@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 2023 Dipl.-Ing. Jochen Menzel (Jehdar@gmx.de)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Hey Emacs, this is a -*- makefile -*-
 #
 # WinAVR makefile written by Eric B. Weddington, Joerg Wunsch, et al.

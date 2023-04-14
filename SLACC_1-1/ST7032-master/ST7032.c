@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 2019 tomozh http://ore-kb.net/archives/195
+//
+// SPDX-License-Identifier: MIT
+
 /* hijacked from arduino ST7032i library */
 
 #include <stdint.h>

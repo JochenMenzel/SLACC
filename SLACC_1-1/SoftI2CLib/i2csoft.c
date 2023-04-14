@@ -1,11 +1,6 @@
-/**********************************************************
+// Copyright 2008-2012
+// SPDX-FileCopyrightText: 2023 2008-20012 eXtreme Electronics, India (https://extremeelectronics.co.in/)
 
-Software I2C Library for AVR Devices.
-
-Copyright 2008-2012
-eXtreme Electronics, India
-www.eXtremeElectronics.co.in
-**********************************************************/
  
 #include <avr/io.h>
 #include <util/delay.h>

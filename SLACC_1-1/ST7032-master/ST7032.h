@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 2019 tomozh http://ore-kb.net/archives/195
+//
+// SPDX-License-Identifier: MIT
+
 #ifndef __ST7032_H__
 #define __ST7032_H__
 
