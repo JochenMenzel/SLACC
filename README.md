@@ -113,9 +113,9 @@ is because the actual supply voltage of the sensors is not +5.00V but 4.89V (or 
 
 # future work
 * for some strange reason, i commented out the switch-off of the ADC reference voltage and the temperature sensors. I do not remember why - possibly the power saving effect was less than expected. I need to check this, again.
-* there may be some efficiency gains in reducing the switching frequency in low and maybe high load conditions. The prep work for adaptive switching frequency already is in the code. Analyze the effiency input to output under various load conditions for two or three switching frequencies, in the future.
+* there may be some efficiency gains in reducing the switching frequency in low and maybe high load conditions. The prep work for adaptive switching frequency already is in the code. Analyze the effiency input-to-output under various load conditions for two or three switching frequencies, in the future.
 
 # disclaimer
 The designs presented in this project are at "working prototype"-level. Please do not expect a design-set for a ready-made product; Use at your own risk.
 
-I have taken care to check and respect the license situation of the works i reference. Any alledged or actual copyright violation is unintentional. If you feel that this project violates a copy right you believe to own or can proof ownership of, please contact me before you take any other steps. I will readily remove the disputed content.
+I have taken care to check and respect the license situation of the works i reference. Any alledged or actual copyright violation is unintentional. If you feel that this project violates a copy right you believe to own or can proof ownership of, please contact me before you take any other steps. I will  then remove the disputed content asap.
