@@ -55,7 +55,7 @@ firmware/ST7032-master/examples/SerialDisplay/SerialDisplay.ino \
 firmware/ST7032-master/examples/TextDirection/TextDirection.ino \
 firmware/ST7032-master/examples/setCursor/setCursor.ino
 
-reuse addheader --copyright "2008-20012 eXtreme Electronics, India (https://extremeelectronics.co.in/)" \
+reuse addheader --license CC-BY-4.0 --copyright "2008-20012 eXtreme Electronics, India (https://extremeelectronics.co.in/)" \
 firmware/SoftI2CLib/SoftwareI2CLibraryforAVRMCUs.pdf \
 firmware/SoftI2CLib/i2csoft.c \
 firmware/SoftI2CLib/i2csoft.h
