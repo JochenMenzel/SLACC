@@ -12,10 +12,10 @@ CPRGHT_MJ="2019 Dr. Martin Jäger (https://libre.solar)"
 CPRGHT_ST7032="2019 tomozh http://ore-kb.net/archives/195"
 START_PATH=$PWD
 
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" reusescript.sh
+reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" README.md reusescript.sh
 
 cd "$START_PATH/firmware"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" makefile README.md
+reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" makefile
 
 cd "$START_PATH/firmware/inc"
 
@@ -100,7 +100,8 @@ mv firmware/.cproject firmware/.cproject.xml
 mv firmware/.project firmware/.project.xml
 reuse addheader --license CC0-1.0 --copyright "2019 Jane Doe <jane@example.com>" \
 firmware/.cproject.xml \
-firmware/.project.xml
+firmware/.project.xml \
+.gitignore
 mv firmware/.cproject.xml firmware/.cproject
 mv firmware/.project.xml firmware/.project
 
