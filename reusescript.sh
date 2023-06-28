@@ -61,11 +61,11 @@ firmware/SoftI2CLib/i2csoft.c \
 firmware/SoftI2CLib/i2csoft.h
 
 cd "$START_PATH/build_pictures"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_MJ" \
+reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 DSCF5579.JPG DSCF5580.JPG DSCF5581.JPG DSCF5582.JPG DSCF5583.JPG 
 
 cd "$START_PATH/build_pictures/number 1"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_MJ" \
+reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20170624_163031.jpg 20170715_121228.jpg 20170715_121240.jpg 20170715_121252.jpg 20170716_202529.jpg \
 20170716_215857.jpg 20170716_215902.jpg 20170716_222513.jpg 20170716_230438.jpg 20170716_231204.jpg \
 20170716_231448.jpg 20170716_233421.jpg 20170718_230503.jpg 20170718_230512.jpg 20170718_230518.jpg \
@@ -74,7 +74,7 @@ reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_MJ" \
 20170806_231130.jpg 20170806_231135.jpg 20170806_231148.jpg 20170806_231153.jpg 20170806_231237.jpg
 
 cd "$START_PATH/build_pictures/number 2"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_MJ" \
+reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20180123_220905.jpg 20180123_220919.jpg 20180123_222154.jpg 20180123_232148.jpg 20180123_232231.jpg \
 20180123_234353.jpg 20180125_195158.jpg 20180128_180303.jpg 20180128_180322.jpg 20180128_180336.jpg \
 20180128_180549.jpg 20180128_180554.jpg 20180128_181852.jpg 20180128_181918.jpg 20180201_234318.jpg \
@@ -89,7 +89,7 @@ reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_MJ" \
 20180320_221804.jpg 20180320_221814.jpg 20190401_214330.jpg 20190401_214337.jpg 20190401_214409.jpg
 
 cd "$START_PATH/build_pictures/number 3"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_MJ" \
+reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20190312_184743.jpg 20190312_185648.jpg 20190312_191633.jpg 20190312_202053.jpg 20190312_202104.jpg \
 20190312_202109.jpg 20190312_204302.jpg 20190312_204337.jpg 20190312_204341.jpg 20190313_145729.jpg \
 20190313_145737.jpg 20190314_191201.jpg 20190314_191216.jpg 20190314_191220.jpg 20190314_191243.jpg \
@@ -104,4 +104,3 @@ firmware/.project.xml \
 .gitignore
 mv firmware/.cproject.xml firmware/.cproject
 mv firmware/.project.xml firmware/.project
-
