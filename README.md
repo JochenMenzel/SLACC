@@ -40,9 +40,9 @@ EMI turned out to be a problem for the I2C display: I2C is notorically prone to 
 
 Full load tests on the bench showed that the power MosFETs run rather cool. Instead, the output capacitors turned quite hot. 
 
-It is a good idea to do tests on the voltage and current measurement of each individual device and then correct the linearization tables in the source code: This way you eliminate slight inaccuracies introduces by the parts tolerances of the shunts, current amplifiers and associated passives.
+It is a good idea to do tests on the voltage and current measurement of each individual device and then correct the linearization tables in the source code: This way you eliminate slight inaccuracies introduced by the parts tolerances of the shunts, current amplifiers and associated passives.
 
-All the parts needed to build one cost me approx. 50€; This is exclusive the fan, the housing, the emergency off switch, the Anderson PowerPole connectors, the MC4 connectors and the 4-wire M8 PU cable and M8-plug: These parts i recycled from junk.
+All the parts needed to build one cost me approx. 50€; This is exclusive the fan, the housing, the emergency off switch, the Anderson PowerPole connectors, the MC4 connectors and the 4-wire M8 PU cable and M8-plug: These parts i recycled from junk. There is some cost saving potential by ordering parts for several SLACCs at once and there is also some cost saving potential in the design. For example i ordered large heatsinks for the MosFETs. These are not necessary, however; you can save 5€ per SLACC by reusing e.g. a Pentium II CPU heatsink from a scrapyard.
 
 # hardware changes
 
@@ -59,7 +59,8 @@ Hare are the changes i made to the original board design SLACC 1-1 by Frank Bät
 
 * Power saving:
     * fake-TO220 step-down voltage regulator for the +5V supply. e.g. search ebay for "DC-DC Buck  Converter Adjustable Mini Step-down Module 1.8V 3.3V 5V 9V 12V 2A". Careful: Often, these modules have a copper bridge across the "Adjust" jumper. I did not see this, soldered the "5V" jumper and powered up the SLACC. Only after the AVR died and ceased to respond to ISP, i measured the module's output to be 9V. Better aproach: Leave the "Adjust" bridge as it is and solder the "9V" jumper. Then measure and adjust the output to 5.0V *before* you solder the module into the SLACC.
-    * switchable ADC reference and temperature sensors: disconnect R23 and R19, R22 and R25 from +5V and connect to PB0, instead. This can nicely be wired via the PB0-pad of R13.
+Using a step-down reulator reduced idle current consumption from 22 to 8mA, so it is a substantial improvement.
+    * switchable ADC reference and temperature sensors: disconnect R23 and R19, R22 and R25 from +5V and connect to PB0, instead. This can nicely be wired via the PB0-pad of R13. Please note that i did not fully investigate yet if a switchable ADC reference and temperature sensors work as expected in all situations and if the actual power saving achieveable by this feature is relevant.
 * slight improvements to efficiency:
     * switch off power stages independently for low-to-medium power single-stage operation: disconnect gate driver U$2's _SD (pin 3) from the MCU. Connect to MCU PB1, instead.
     * use Low-ESR types for all power capcitors
@@ -101,13 +102,13 @@ The firmware bases on the work of others:
 # firmware changes and hints
 
 * configuration values and thresholds are in main.h
-* the original charger algorithm emphasized full-cycle use of the batteries. I.e. it let the batteries drain down to approx. 10% SOC, then recharged to 100%SOC. This unsatisfactory in combination with solar power: During mornings, the batteries reached full charge and the SLACC turned off. Then, during the day, the SLACC did not route solar power to water pump, refridgerator cooling fan, lighting etc. but instead let me drain the batteries. As a fix, i adopted the [charge state machine](https://libre.solar/charge-controller-firmware/src/overview/charger_concepts.html#charger-state-machine) from libre solar.
+* the original charger algorithm emphasized full-cycle use of the batteries. I.e. it let the batteries drain down to approx. 10% SOC, then recharged to 100%SOC. This is undesireable in combination with solar power: During mornings, the batteries reached full charge and the SLACC turned off. Then, during the day, the SLACC did not route solar power to water pump, refridgerator cooling fan, lighting etc. but instead let me drain the batteries. As a fix, i adopted the [charge state machine](https://libre.solar/charge-controller-firmware/src/overview/charger_concepts.html#charger-state-machine) from libre solar.
 * for the display i used the [i2csoft](https://extremeelectronics.co.in/avr-tutorials/software-i2c-library-for-avr-mcus/) and [ST7032](http://ore-kb.net/archives/195) libraries with some modifications.
 * the display shows current and voltage of PV module and battery, the temperature sensor 1 and the operational state ((idle, bulk, float). Nice, imho!
 * the fan turns on at 60°C and off at 50°C. This simple bang-bang control proved quite effective and - in combination with the 24V fan running quiet on 12V - acceptably unobtrusive.
 * measurements during bench testing showed a noteable difference between the temperature values shown and the actual temperatures i measured with a TC. This
-is because the actual supply voltage of the sensors is not +5.00V but 4.89V (or whatever your +5V stepdown voltage regulator module decides to output.) To correct this, i have given up temperature sensor 3 and use ADC0 to measure the temperature sensor supply voltage via a voltage divider, instead. Then i use the actual sensor supply voltage for corrected ADC-to-temperature calculactions.
-* the main loop checks if the SLACC stopped charging for more than 15s. If so, the firmware and enters a power down sleep mode and checks for PV output every 8s.
+is because the actual supply voltage of the sensors is not +5.00V but 4.89V (or whatever your +5V stepdown voltage regulator module decides to output.) To correct this, i have given up temperature sensor 3 and use ADC0 to measure the temperature sensor supply voltage via a voltage divider, instead. Then i use the actual sensor supply voltage for corrected ADC-to-temperature calculactions. This also slightly improved the accuracy of current- and voltage measurements.
+* the main loop checks if the SLACC stopped charging for more than 15s. If so, the firmware enters a power down sleep mode and checks for PV output every 8s.
 * i implemented some crude minimalist protection against reverse current flow in low-light conditions.
 * i had to limit the PWM duty cycle to 99.2% because the high-side MosFET gate drivers use capacitive bootstrapping. This will cease to function at 100% duty cycle and the gate driver cannot keep the high-side MosFETs fully turned-on - a highly undesireable operational state for a stepdown converter.
 
