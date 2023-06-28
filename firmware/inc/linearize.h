@@ -1,5 +1,5 @@
+// SPDX-FileCopyrightText: 2023 2012 Frank Bättermann (frank@ich-war-hier.de)
 // SPDX-FileCopyrightText: 2023 2023 Dipl.-Ing. Jochen Menzel (Jehdar@gmx.de)
-// SPDX-FileCopyrightText: 2023 CPRGHT_BM
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 

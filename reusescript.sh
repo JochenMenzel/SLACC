@@ -12,34 +12,34 @@ CPRGHT_MJ="2019 Dr. Martin Jäger (https://libre.solar)"
 CPRGHT_ST7032="2019 tomozh http://ore-kb.net/archives/195"
 START_PATH=$PWD
 
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" README.md reusescript.sh
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" README.md reusescript.sh
 
 cd "$START_PATH/firmware"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" makefile
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" makefile
 
 cd "$START_PATH/firmware/inc"
 
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" --copyright "CPRGHT_BM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" --copyright "$CPRGHT_BM" \
 adc.h csv.h datetime.h fan.h fifo.h linearize.h measurement.h pwm.h time.h timer2.h uart.h
 
-reuse addheader --license Apache-2.0 --copyright "$CPRGHT_MJ" \
+reuse annotate --license Apache-2.0 --copyright "$CPRGHT_MJ" \
 charger.h mppt.h
 
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 hmi.h main.h pwr_management.h
 
 cd "$START_PATH/firmware/src"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" --copyright "CPRGHT_BM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" --copyright "$CPRGHT_BM" \
 adc.c csv.c datetime.c fan.c fifo.c linearize.c measurement.c pwm.c time.c timer2.c uart.c
 
-reuse addheader --license Apache-2.0 --copyright "$CPRGHT_MJ" \
+reuse annotate --license Apache-2.0 --copyright "$CPRGHT_MJ" \
 charger.c mppt.c
 
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 hmi.c main.c pwr_management.c
 
 cd "$START_PATH"
-reuse addheader --license MIT --copyright "$CPRGHT_ST7032" \
+reuse annotate --license MIT --copyright "$CPRGHT_ST7032" \
 firmware/ST7032-master/ST7032.c \
 firmware/ST7032-master/ST7032.h \
 firmware/ST7032-master/arduino_st7032_sch.png \
@@ -55,17 +55,17 @@ firmware/ST7032-master/examples/SerialDisplay/SerialDisplay.ino \
 firmware/ST7032-master/examples/TextDirection/TextDirection.ino \
 firmware/ST7032-master/examples/setCursor/setCursor.ino
 
-reuse addheader --license CC-BY-4.0 --copyright "2008-20012 eXtreme Electronics, India (https://extremeelectronics.co.in/)" \
+reuse annotate --license CC-BY-4.0 --copyright "2008-20012 eXtreme Electronics, India (https://extremeelectronics.co.in/)" \
 firmware/SoftI2CLib/SoftwareI2CLibraryforAVRMCUs.pdf \
 firmware/SoftI2CLib/i2csoft.c \
 firmware/SoftI2CLib/i2csoft.h
 
 cd "$START_PATH/build_pictures"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 DSCF5579.JPG DSCF5580.JPG DSCF5581.JPG DSCF5582.JPG DSCF5583.JPG 
 
 cd "$START_PATH/build_pictures/number 1"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20170624_163031.jpg 20170715_121228.jpg 20170715_121240.jpg 20170715_121252.jpg 20170716_202529.jpg \
 20170716_215857.jpg 20170716_215902.jpg 20170716_222513.jpg 20170716_230438.jpg 20170716_231204.jpg \
 20170716_231448.jpg 20170716_233421.jpg 20170718_230503.jpg 20170718_230512.jpg 20170718_230518.jpg \
@@ -74,7 +74,7 @@ reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20170806_231130.jpg 20170806_231135.jpg 20170806_231148.jpg 20170806_231153.jpg 20170806_231237.jpg
 
 cd "$START_PATH/build_pictures/number 2"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20180123_220905.jpg 20180123_220919.jpg 20180123_222154.jpg 20180123_232148.jpg 20180123_232231.jpg \
 20180123_234353.jpg 20180125_195158.jpg 20180128_180303.jpg 20180128_180322.jpg 20180128_180336.jpg \
 20180128_180549.jpg 20180128_180554.jpg 20180128_181852.jpg 20180128_181918.jpg 20180201_234318.jpg \
@@ -89,7 +89,7 @@ reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20180320_221804.jpg 20180320_221814.jpg 20190401_214330.jpg 20190401_214337.jpg 20190401_214409.jpg
 
 cd "$START_PATH/build_pictures/number 3"
-reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
+reuse annotate --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 20190312_184743.jpg 20190312_185648.jpg 20190312_191633.jpg 20190312_202053.jpg 20190312_202104.jpg \
 20190312_202109.jpg 20190312_204302.jpg 20190312_204337.jpg 20190312_204341.jpg 20190313_145729.jpg \
 20190313_145737.jpg 20190314_191201.jpg 20190314_191216.jpg 20190314_191220.jpg 20190314_191243.jpg \
@@ -98,7 +98,7 @@ reuse addheader --license GPL-3.0-or-later --copyright "$CPRGHT_JM" \
 cd "$START_PATH"
 mv firmware/.cproject firmware/.cproject.xml 
 mv firmware/.project firmware/.project.xml
-reuse addheader --license CC0-1.0 --copyright "2019 Jane Doe <jane@example.com>" \
+reuse annotate --license CC0-1.0 --copyright "2019 Jane Doe <jane@example.com>" \
 firmware/.cproject.xml \
 firmware/.project.xml \
 .gitignore
